@@ -2,25 +2,26 @@
  * \file skeleton.c
  */
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 // just a hack because mkostemp seems to be undefined in including <stdio.h>
 // extern int mkostemp (char *__template, int __flags) __nonnull ((1)) __wur;
 
-#include<string.h>
-#include<errno.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/wait.h>
-#include<fcntl.h>
-#include<libgen.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <libgen.h>
+//#include <sys/syslimits.h>
+#include <limits.h>
 
 #define STDOUT 1
 #define STDERR 2
 
 #define USAGE_SYNTAX "[arg1] [arg2] ... [argN]"
 
-#define PATH_SZ 1024
 #define BUFFER_SZ 1024
 
 
@@ -56,7 +57,6 @@ void print_usage(char* bin_name)
 int main(int argc, char** argv)
 {
 	pid_t pere, fils;
-	int cr;
 
 	if (argc<=1) { print_usage(argv[0]); exit(EXIT_SUCCESS); }
 
@@ -65,38 +65,47 @@ int main(int argc, char** argv)
 	pere = getpid();
 	fils = fork();
 	if (fils == 0) {
-		int fd_temp, stdout;
-		pid_t p;
-		char path[PATH_SZ];
+		int fd_temp, fd_stdout;
+		char path[PATH_MAX];
 		char buffer[BUFFER_SZ];
 
-		p = getpid();
-		printf("[FILS] PID=[%d]\n", p);
+		printf("[FILS] PID=[%d]\n", getpid());
 
-		stdout = dup(STDOUT);
+		fd_stdout = dup(STDOUT);
 		close(STDOUT);
 
-		snprintf(path, PATH_SZ, "/tmp/%s_XXXXXX", basename(argv[0]));
+		snprintf(path, PATH_MAX, "/tmp/%s_XXXXXX", basename(argv[0]));
 
 		if ((fd_temp = mkstemp(path)) <0) {
+			perror("mkstemp");
 			dprintf(STDERR, "error: mkstemp - can't create [%s] file.\n", path);
 			exit(EXIT_FAILURE);
 		}
 
-		if (dup2(stdout, STDOUT) <0) {
-			printf("error: dup2 - can't dup [%d] to [%d]\n", fd_temp, STDOUT);
+		// delete file when the fd is closed or the program ends.
+		unlink(path);
+
+		if (dup2(fd_stdout, STDOUT) <0) {
+			perror("dup2");
+			dprintf(STDERR, "error: dup2 - can't dup [%d] to [%d]\n", fd_temp, STDOUT);
 			exit(EXIT_FAILURE);
 		}
+
 		snprintf(buffer, BUFFER_SZ, "[FILS] mkstemp FD=[%d]\n", fd_temp);
 		printf("%s", buffer);
-		//write(fd_temp, buffer, strlen(buffer));
+
+		if (execvp(argv[1], argv+1) == -1) {
+			perror("execv");
+			exit(EXIT_FAILURE);
+		}
 
 		close(fd_temp);
 
+
 	} else {
-		cr = 0;
+		int cr = -1;
 		wait(&cr);
-		printf("[PERE] PID=[%d] That's All Folks !\n", pere);
+		printf("[PERE] PID=[%d] That's All Folks ! (son's CR=[%d])\n", pere, cr);
 	}
 
 	return EXIT_SUCCESS;
