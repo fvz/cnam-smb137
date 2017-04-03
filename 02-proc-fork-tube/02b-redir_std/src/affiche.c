@@ -5,7 +5,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 // just a hack because mkostemp seems to be undefined in including <stdio.h>
-extern int mkostemp (char *__template, int __flags) __nonnull ((1)) __wur;
+// extern int mkostemp (char *__template, int __flags) __nonnull ((1)) __wur;
 
 #include<string.h>
 #include<errno.h>
@@ -13,11 +13,16 @@ extern int mkostemp (char *__template, int __flags) __nonnull ((1)) __wur;
 #include<sys/types.h>
 #include<sys/wait.h>
 #include<fcntl.h>
+#include<libgen.h>
 
 #define STDOUT 1
 #define STDERR 2
 
 #define USAGE_SYNTAX "[arg1] [arg2] ... [argN]"
+
+#define PATH_SZ 1024
+#define BUFFER_SZ 1024
+
 
 /*
 Realisez l'exercice suivant en realisant les etapes dans l'ordre specifie
@@ -53,35 +58,39 @@ int main(int argc, char** argv)
 	pid_t pere, fils;
 	int cr;
 
-	if (argc<=1) {
-		print_usage(argv[0]);
-		exit(EXIT_SUCCESS);
-	}
+	if (argc<=1) { print_usage(argv[0]); exit(EXIT_SUCCESS); }
 
 	printf("%s\n", argv[1]);
-
 
 	pere = getpid();
 	fils = fork();
 	if (fils == 0) {
-		int fd_temp;
+		int fd_temp, stdout;
 		pid_t p;
-		char *path = "/tmp/XXXXXX-exercice";
+		char path[PATH_SZ];
+		char buffer[BUFFER_SZ];
 
 		p = getpid();
 		printf("[FILS] PID=[%d]\n", p);
-		//close(STDOUT);
 
-		if ((fd_temp = mkostemp(path, O_CREAT|O_RDWR)) < 0)
+		stdout = dup(STDOUT);
+		close(STDOUT);
+
+		snprintf(path, PATH_SZ, "/tmp/%s_XXXXXX", basename(argv[0]));
+
+		if ((fd_temp = mkstemp(path)) <0) {
+			dprintf(STDERR, "error: mkstemp - can't create [%s] file.\n", path);
 			exit(EXIT_FAILURE);
+		}
 
-
-		write(fd_temp, "coucou", 6);
-
-		if (dup2(fd_temp, STDOUT) < 0)
+		if (dup2(stdout, STDOUT) <0) {
+			printf("error: dup2 - can't dup [%d] to [%d]\n", fd_temp, STDOUT);
 			exit(EXIT_FAILURE);
+		}
+		snprintf(buffer, BUFFER_SZ, "[FILS] mkstemp FD=[%d]\n", fd_temp);
+		printf("%s", buffer);
+		//write(fd_temp, buffer, strlen(buffer));
 
-		printf("fd_temp=[%d]\n", fd_temp);
 		close(fd_temp);
 
 	} else {
