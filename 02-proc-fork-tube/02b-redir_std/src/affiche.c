@@ -1,5 +1,5 @@
 /**
- * \file skeleton.c
+ * \file affiche.c
  */
 
 #include <stdio.h>
@@ -14,7 +14,6 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <libgen.h>
-//#include <sys/syslimits.h>
 #include <limits.h>
 
 #define STDOUT 1
@@ -58,13 +57,14 @@ int main(int argc, char** argv)
 {
 	pid_t pere, fils;
 
-	if (argc<=1) { print_usage(argv[0]); exit(EXIT_SUCCESS); }
+	if (argc<=1) {
+		print_usage(argv[0]); exit(EXIT_SUCCESS);
+	}
 
 	printf("%s\n", argv[1]);
 
 	pere = getpid();
-	fils = fork();
-	if (fils == 0) {
+	if ((fils = fork()) == 0) {
 		int fd_temp, fd_stdout;
 		char path[PATH_MAX];
 		char buffer[BUFFER_SZ];
@@ -100,7 +100,6 @@ int main(int argc, char** argv)
 		}
 
 		close(fd_temp);
-
 
 	} else {
 		int cr = -1;
