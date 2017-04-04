@@ -4,9 +4,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-// just a hack because mkostemp seems to be undefined in including <stdio.h>
-// extern int mkostemp (char *__template, int __flags) __nonnull ((1)) __wur;
-
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
@@ -20,9 +17,6 @@
 #define STDERR 2
 
 #define USAGE_SYNTAX "[arg1] [arg2] ... [argN]"
-
-#define BUFFER_SZ 1024
-
 
 /*
 Realisez l'exercice suivant en realisant les etapes dans l'ordre specifie
@@ -45,36 +39,40 @@ On s'assurera que le bon nombre de parametres est passe sur la ligne de commande
 (*)facultatif
 */
 
-
 void print_usage(char* bin_name)
 {
 	dprintf(STDOUT, "USAGE: %s %s\n", bin_name, USAGE_SYNTAX);
 }
 
-#define __USE_GNU 1
-
 int main(int argc, char** argv)
 {
-	pid_t pere, fils;
+	int i;
+	pid_t parent, child;
 
 	if (argc<=1) {
 		print_usage(argv[0]); exit(EXIT_SUCCESS);
 	}
 
-	printf("%s\n", argv[1]);
+	parent = getpid();
 
-	pere = getpid();
-	if ((fils = fork()) == 0) {
+	printf("[PARENT-%d] arguments=[", parent);
+	for(i=1; i<argc; i++) {
+		printf("%s%c", argv[i], ((i+1)<argc)?' ':'\0');
+	}
+	printf("]\n");
+
+	// forking program
+	if ((child = fork()) == 0) {
 		int fd_temp, fd_stdout;
 		char path[PATH_MAX];
-		char buffer[BUFFER_SZ];
+		pid_t selfpid = getpid();
 
-		printf("[FILS] PID=[%d]\n", getpid());
+		printf("[CHILD-%d] duping and closing STDOUT...\n", selfpid);
 
 		fd_stdout = dup(STDOUT);
 		close(STDOUT);
 
-		snprintf(path, PATH_MAX, "/tmp/%s_XXXXXX", basename(argv[0]));
+		snprintf(path, PATH_MAX, "/tmp/%s-%d_XXXXXX", basename(argv[0]), selfpid);
 
 		if ((fd_temp = mkstemp(path)) <0) {
 			perror("mkstemp");
@@ -82,7 +80,7 @@ int main(int argc, char** argv)
 			exit(EXIT_FAILURE);
 		}
 
-		// delete file when the fd is closed or the program ends.
+		// deletion of file will be effective when the fd is closed or the program ends.
 		unlink(path);
 
 		if (dup2(fd_stdout, STDOUT) <0) {
@@ -91,9 +89,9 @@ int main(int argc, char** argv)
 			exit(EXIT_FAILURE);
 		}
 
-		snprintf(buffer, BUFFER_SZ, "[FILS] mkstemp FD=[%d]\n", fd_temp);
-		printf("%s", buffer);
+		printf("[CHILD-%d] mkstemp[%s] -> FD=[%d].\n", selfpid, path, fd_temp);
 
+		printf("[CHILD-%d] execvp(%s)...\n", selfpid, argv[1]);
 		if (execvp(argv[1], argv+1) == -1) {
 			perror("execv");
 			exit(EXIT_FAILURE);
@@ -103,8 +101,9 @@ int main(int argc, char** argv)
 
 	} else {
 		int cr = -1;
+		printf("[PARENT-%d] waiting CHILD[%d]...\n", parent, child);
 		wait(&cr);
-		printf("[PERE] PID=[%d] That's All Folks ! (son's CR=[%d])\n", pere, cr);
+		printf("[PARENT-%d] CHILD[%d]-CR=[%d] That's All Folks !\n", parent, child, cr);
 	}
 
 	return EXIT_SUCCESS;
