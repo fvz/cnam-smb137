@@ -32,8 +32,9 @@
 
 int main(int argc, char** argv)
 {
-	int pipefd[2], devnull_fd = -1;
-	int status = -1;
+	int pipefd[2];
+	int devnull_fd = -1;
+	int status = 0;
 	pid_t parent, child1, child2;
 
 
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
 		dprintf(STDERR, "error: can't create a pipe.\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("[PARENT-%d] Pipe created :  pipefd = ( [0] => %d , [1] => %d )\n", parent, pipefd[0], pipefd[1]);
+	printf("[PARENT-%d] Pipe created : pipefd[0,1]=(%d,%d)\n", parent, pipefd[0], pipefd[1]);
 
 	printf("[PARENT-%d] Open /dev/null for STDOUT redirection.\n", parent);
 	if ((devnull_fd = open("/dev/null", O_WRONLY)) == -1) {
@@ -55,66 +56,55 @@ int main(int argc, char** argv)
 	}
 
 	child1 = fork();
+	if (child1 <0) {
+		perror("fork");
+		dprintf(STDERR, "error: can't fork the program.\n");
+		exit(EXIT_FAILURE);
+	}
 	if (child1 == 0) {
 		printf("[CHILD-%d] Closing pipefd[0] and duping STDOUT to pipefd[1].\n", getpid());
-		close(pipefd[0]); // Child1 (ps) : unused side (in) of pipe
-		dup2(pipefd[1], STDOUT); // Connexion of child stdout to the write side of the pipe
+		close(pipefd[0]); // child1 (ps) : unused side (in) of pipe
+		dup2(pipefd[1], STDOUT); // Connexion : child stdout -> write side of pipe
 		//execlp("/bin/ls", "ls", "-l", "/tmp/", (char *)NULL);
 		execlp("/bin/ps", "ps", "eaux", (char *)NULL);
+		perror("execlp ps");
+		exit(1);
 	}
 
 	child2 = fork();
+	if (child2 <0) {
+		perror("fork");
+		dprintf(STDERR, "error: can't fork the program.\n");
+		exit(EXIT_FAILURE);
+	}
 	if (child2 == 0) {
 		printf("[CHILD-%d] Closing pipefd[1] and duping STDIN to pipefd[0].\n", getpid());
-		close(pipefd[1]); // Child2 (grep) : unused side (out) of pipe
+		close(pipefd[1]); // child2 (grep) : unused side (out) of pipe
 		dup2(devnull_fd, STDOUT); // redirection of stdout to /dev/null
-		dup2(pipefd[0], STDIN); // connexion of stdin child to the read side of the pipe
+		dup2(pipefd[0], STDIN); // connexion : child stdin -> read side of pipe
 		//execlp("tr", "tr", "a-z", "A-Z", (char *)NULL);
 		execlp("grep", "grep", "\"^root \"", (char *)NULL);
+		perror("execlp grep");
+		exit(1);
 	}
+	else {
+		printf("[PARENT-%d] Closing /dev/null (FD=[%d]) and pipe[0,1]=(%d,%d)\n",
+			parent, devnull_fd, pipefd[0], pipefd[1]);
 
-	printf("[PARENT-%d] Closing /dev/null (FD=[%d]) and pipe[0,1]=(%d,%d)\n",
-		parent, devnull_fd, pipefd[0], pipefd[1]);
+		close(devnull_fd);
+		close(pipefd[0]);
+		close(pipefd[1]);
 
-	close(devnull_fd);
-	close(pipefd[0]);
-	close(pipefd[1]);
+		printf("[PARENT-%d] Waiting Child2-%d ...\n", parent, child2);
+		waitpid(child2, &status, 0);
 
-	printf("[PARENT-%d] Waiting Child2-%d ...\n", parent, child2);
-	waitpid(child2, &status, 0);
+		printf("[PARENT-%d] End of [Child-%d]. Status=[%d].\n", parent, child2, status);
 
-	printf("[PARENT-%d] End of [Child2-%d]. Status=[%d].\n", parent, child2, status);
-
-	if (WEXITSTATUS(status) == 0) { /* condition '&&' => return code of child = 0 */
-		write(STDOUT, "root est connecté.\n", 20);
+		/* condition '&&' => return code of child = 0 */
+		if (WEXITSTATUS(status) == 0) {
+			write(STDOUT, "root est connecté.\n", 20);
+		}
 	}
 
 	return EXIT_SUCCESS;
 }
-
-
-
-/*
-perror("fork"); dprintf(STDERR, "error: can't fork the program.\n"); exit(EXIT_FAILURE);
-perror("fork"); dprintf(STDERR, "error: can't fork the program.\n"); exit(EXIT_FAILURE);
-printf("[CHILD#1-%d] Duping [%d] to [%d] ...", selfpid, pipefd[1], STDOUT);
-printf("[CHILD#2-%d] Duping [%d] to [%d] ...", selfpid, pipefd[0], STDIN);
-if (dup2(pipefd[1], STDOUT) <0) {
-perror("dup2");
-dprintf(STDERR, "error: dup2 - can't dup [%d] to [%d]\n", pipefd[1], STDOUT);
-exit(EXIT_FAILURE);
-}
-
-if (dup2(pipefd[0], STDIN) <0) {
-perror("dup2");
-dprintf(STDERR, "error: dup2 - can't dup [%d] to [%d]\n", pipefd[0], STDIN);
-exit(EXIT_FAILURE);
-}
-
-int cr = -1;
-close(pipefd[0]);
-close(pipefd[1]);
-printf("[PARENT-%d] Waiting...\n", parent);
-wait(&cr);
-printf("[PARENT-%d] Wait ends.\n", parent);
-*/
