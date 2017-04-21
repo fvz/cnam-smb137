@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -c
-LDFLAGS=-I ./include/
+LDFLAGS=-I ./include/ -pthread
 
 SRC_DIR=./src
 INC_DIR=./include

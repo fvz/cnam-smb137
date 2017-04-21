@@ -13,6 +13,7 @@
 #include <libgen.h>
 #include <limits.h>
 #include <time.h>
+#include <pthread.h>
 
 /*
    Ecrivez un programme qui :
@@ -21,7 +22,7 @@
 
    Le tableau sera declare en variable globale :
    #define SIZE (int)1e8
-   int tab[SIZE];
+   int tab[SIZE];
 
    Le programme affichera egalement le temps de la recherche du min/max (temps
    d’initialisation non compris). On utilisera la fonction gettimeofday.
@@ -31,52 +32,141 @@
      utilisee). Testez ce programme avec 2, 4, 8 threads et en augmentant la taille
      du tableau. Que constatez-vous ?
 
-   - Ajoutez ensuite un mutex pour proteger l’acces aux variables globales resultats.
+   - Ajoutez ensuite un mutex pour proteger l'acces aux variables globales resultats.
 
    Remarque : on utilise gettimeofday et non clock car gettimeofday rend le temps
    machine reel alors que clock donne la somme des temps d’execution des threads (principal et fils).
 
-   Remarque 2 : pour la phase de compilation ne pas oublier d’utiliser l’option –lpthread avec gcc.
+   Remarque 2 : pour la phase de compilation ne pas oublier d'utiliser l'option -lpthread avec gcc.
 
    TODO : idee de proposer la saisie (fonction scanf) de la taille tableau + nb thread
 */
 
 #define SIZE ((int)1e8)
-int tab[SIZE];
+int tab[5*SIZE];
+
+
+typedef struct resultat_s {
+	int min;
+	int max;
+	int b, e; /* begin/end (array range to scan) */
+} resultat_t;
+typedef resultat_t* resultat_p;
+
+
+typedef struct mythread_s {
+	pthread_t th;
+	resultat_t r;
+} mythread_t;
+typedef mythread_t* mythread_p;
+
+
+void *search_min_max(void *arg)
+{
+	mythread_p t = (mythread_p) arg;
+	int i;
+	for (i=t->r.b; i<t->r.e; i++) {
+		if (tab[i] < t->r.min) { t->r.min = tab[i]; }
+		if (tab[i] > t->r.max) { t->r.max = tab[i]; }
+
+		/* just for debug */
+		#if 0
+		if (i%10000 == 0) {
+			printf("thread[%li] i=[%d]\n", (unsigned long int) t->th, i);
+		}
+		#endif
+	}
+	pthread_exit(NULL);
+}
 
 int main(int argc, char** argv)
 {
 	int i, len;
-	int min, max;
 	struct timeval t1, t2;
+	resultat_t r;
+	int ith, nthread = 4;
+	mythread_t *mythreads;
+
+	printf("Number of threads [%d]: ", nthread);
+	// FIXME : si vide (enter), prendre valeur par defaut
+	scanf("%d", &nthread);
 
 	len = sizeof(tab)/sizeof(int);
 
-	printf("[notice] const: RAND_MAX=[%u] INT_MAX=[%u] UINT_MAX=[%u]\n", RAND_MAX, INT_MAX, UINT_MAX);
-	printf("[notice] sizeof(tab)=[%ld]  size(tab)=[%d elements]\n", sizeof(tab), len);
+	//printf("[notice] const: RAND_MAX=[%u] INT_MAX=[%u] UINT_MAX=[%u]\n", RAND_MAX, INT_MAX, UINT_MAX);
+	//printf("[notice] sizeof(tab)=[%ld]  size(tab)=[%d elements]\n", sizeof(tab), len);
 
-	printf("initialization 'tab' (array of %d elements) ... ", len);
 	srand(time(NULL));
-	for (i=0; i < len; i++) {
-		tab[i] = rand();
-		//printf("%d ", tab[i]);
-	}
+	printf("initialization 'tab' (array of %d elements) ... ", len);
+	for (i=0; i<len; i++) { tab[i] = rand(); }
 	printf("[OK]\n");
 
-	min = max = tab[0];
+
+/*** WITHOUT THREAD ****
+	r.min = r.max = tab[0];
+	r.b = 0; r.e = len;
 
 	printf("searching min & max ... ");
 	gettimeofday(&t1, NULL);
-	for (i=1; i < len; i++) {
-		if (tab[i] < min) {
-			min = tab[i];
-		}
-		if (tab[i] > max) {
-			max = tab[i];
-		}
+	search_min_max(&r);
+	for (i=r.b; i<r.e; i++) {
+		if (tab[i] < r.min) { r.min = tab[i]; }
+		if (tab[i] > r.max) { r.max = tab[i]; }
 	}
 	gettimeofday(&t2, NULL);
 	printf("[OK]\n");
+***/
+
+
+	mythreads = (mythread_t *) malloc (nthread * sizeof(mythread_t));
+	gettimeofday(&t1, NULL);
+
+	i=0;
+	int len_by_thread = len / nthread;
+
+	/* creation of N threads */
+	for(ith=0; ith < nthread; ith++) {
+		mythreads[ith].r.b = i;
+		i += len_by_thread;
+		if (i > len) i = len;
+		mythreads[ith].r.e = i;
+		mythreads[ith].r.min = mythreads[ith].r.max = tab[mythreads[ith].r.b];
+
+		if (pthread_create(&(mythreads[ith].th), NULL, search_min_max, (void*)&(mythreads[ith])) == -1) {
+			perror("pthread_create");
+			return EXIT_FAILURE;
+		}
+
+		printf("thread[%d] id=[%li] created.\n", ith, (unsigned long int) mythreads[ith].th);
+	}
+
+	/* join of all N threads */
+	for(ith=0; ith < nthread; ith++) {
+		if (pthread_join(mythreads[ith].th, NULL)) {
+			perror("pthread_join");
+			return EXIT_FAILURE;
+		}
+	}
+
+	/* display of min/max found by each threads */
+	for(ith=0; ith < nthread; ith++) {
+		printf("thread[%d]: min=[%d] max=[%d]\n",
+			ith, mythreads[ith].r.min, mythreads[ith].r.max);
+	}
+
+
+	/* search final min/max between the min/max of all threads */
+	r.min = mythreads[0].r.min;
+	r.max = mythreads[0].r.max;
+	for(ith=1; ith < nthread; ith++) {
+		if (mythreads[ith].r.min < r.min) { r.min = mythreads[ith].r.min; }
+		if (mythreads[ith].r.max > r.max) { r.max = mythreads[ith].r.max; }
+	}
+
+	gettimeofday(&t2, NULL);
+	free (mythreads);
+
+	printf("END: min=[%d] max=[%d]\n", r.min, r.max);
 
 
 	/* time duration in minutes, seconds, microseconds */
