@@ -39,11 +39,10 @@
 
    Remarque 2 : pour la phase de compilation ne pas oublier d'utiliser l'option -lpthread avec gcc.
 
-   TODO : idee de proposer la saisie (fonction scanf) de la taille tableau + nb thread
+   TODO : proposer la saisie (fonction scanf) de la taille tableau + nb thread
 */
 
-#define SIZE ((int)1e8)
-int tab[5*SIZE];
+int *tab = NULL;
 
 
 typedef struct resultat_s {
@@ -87,11 +86,21 @@ int main(int argc, char** argv)
 	int ith, nthread = 4;
 	mythread_t *mythreads;
 
+	#define SIZE (5*((int)1e8))
+
+	len = SIZE;
+
+	printf("mallocing array of [%d] int elements... ", len);
+	if (!(tab = malloc (len * sizeof(int)))) {
+		printf("[NOK]\n");
+		perror("malloc array of int.");
+		return EXIT_SUCCESS;
+	}
+	printf("[OK]\n");
+
 	printf("Number of threads [%d]: ", nthread);
 	// FIXME : si vide (enter), prendre valeur par defaut
 	scanf("%d", &nthread);
-
-	len = sizeof(tab)/sizeof(int);
 
 	//printf("[notice] const: RAND_MAX=[%u] INT_MAX=[%u] UINT_MAX=[%u]\n", RAND_MAX, INT_MAX, UINT_MAX);
 	//printf("[notice] sizeof(tab)=[%ld]  size(tab)=[%d elements]\n", sizeof(tab), len);
@@ -137,7 +146,7 @@ int main(int argc, char** argv)
 			return EXIT_FAILURE;
 		}
 
-		printf("thread[%d] id=[%li] created.\n", ith, (unsigned long int) mythreads[ith].th);
+		printf("thread[%3d] id=[%li] created.\n", ith, (unsigned long int) mythreads[ith].th);
 	}
 
 	/* join of all N threads */
@@ -150,7 +159,7 @@ int main(int argc, char** argv)
 
 	/* display of min/max found by each threads */
 	for(ith=0; ith < nthread; ith++) {
-		printf("thread[%d]: min=[%d] max=[%d]\n",
+		printf("thread[%3d]: min=[%10d] max=[%10d]\n",
 			ith, mythreads[ith].r.min, mythreads[ith].r.max);
 	}
 
@@ -165,6 +174,7 @@ int main(int argc, char** argv)
 
 	gettimeofday(&t2, NULL);
 	free (mythreads);
+	free (tab);
 
 	printf("END: min=[%d] max=[%d]\n", r.min, r.max);
 
