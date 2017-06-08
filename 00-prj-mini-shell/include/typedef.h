@@ -1,0 +1,81 @@
+#ifndef MYSH_TYPEDEF_H
+#define MYSH_TYPEDEF_H
+
+
+
+/* history
+ */
+typedef struct mysh_history_s mysh_history_t;
+typedef mysh_history_t* mysh_history_p;
+struct mysh_history_s {
+    int temp_fd;
+    char *temp_path;
+};
+
+
+/* context
+*/
+typedef struct mysh_context_s mysh_context_t;
+typedef mysh_context_t* mysh_context_p;
+struct mysh_context_s {
+
+    int argc; char **argv;
+
+    char *cmd;
+
+	int debug_level;
+	int verbose_level;
+
+    mysh_history_p history;
+
+    int status;
+};
+
+/* context status */
+#define CTX_STATUS_EXIT     0x00    /* program in exiting stage */
+#define CTX_STATUS_LOOP     0x01    /* program in looping stage */
+
+
+
+/* cmdredir : a command redirection (string of command associated to a redirection operator like '>', '>>', '<', '<<')
+ */
+typedef struct cmdredir_s cmdredir_t;
+typedef cmdredir_t* cmdredir_p;
+struct cmdredir_s {
+    char *cmd;
+    int redir;
+    cmdredir_p prev;
+    cmdredir_p next;
+};
+
+#define CMDREDIR_EMPTY      0x00    /* empty redirection operator */
+#define CMDREDIR_TRUNCAT    0x01    /* >  : truncat redirection operator */
+#define CMDREDIR_APPEND     0x02    /* >> : append redirection operator */
+#define CMDREDIR_INPUT      0x04    /* <  : input redirection operator */
+#define CMDREDIR_DINPUT     0x08    /* << : ?? */
+
+
+
+/* cmdoper : a command operator  (string of command associated to an operator like '&&', '||', '|', '&')
+ */
+typedef struct cmdoper_s cmdoper_t;
+typedef cmdoper_t* cmdoper_p;
+struct cmdoper_s {
+    char *cmd;
+    int oper;
+    cmdredir_p redir;
+    cmdoper_p prev;
+    cmdoper_p next;
+};
+
+#define CMDOPER_EMPTY      0x00    /* empty operator */
+#define CMDOPER_SEMICOLON  0x01    /* ';'  : semicolon operator */
+#define CMDOPER_PIPE       0x02    /* '|'  : pipe operator */
+#define CMDOPER_OR         0x04    /* '||' : logic OR operator */
+#define CMDOPER_BACKGND    0x08    /* '&'  : background operator */
+#define CMDOPER_AND        0x10    /* '&&' : logic AND operator */
+
+
+
+
+#endif /* MYSH_TYPEDEF_H */

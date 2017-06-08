@@ -1,6 +1,5 @@
-/**
- * \file mysh.h
- */
+#ifndef MYSH_MYSH_H
+#define MYSH_MYSH_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +16,31 @@
 #include <getopt.h>
 
 
+
+
 /* for catching CTRL+C */
-#include <signal.h> 
+#include <signal.h>
 
 /* va_list / va_start / va_end */
 #include <stdarg.h>
+
+/* true and false constants */
+#include <stdbool.h>
+
+/* getpwuid/getuid */
+#include <pwd.h>
+
+
+/* mysh project */
+#include "typedef.h"
+#include "cmdoper_parser.h"
+#include "cmdredir_parser.h"
+#include "mysh_context.h"
+#include "mysh_history.h"
+#include "facilities.h"
+#include "mysh_prompt.h"
+#include "cmdhandle.h"
+
+
+
+#endif /* MYSH_MYSH_H */
