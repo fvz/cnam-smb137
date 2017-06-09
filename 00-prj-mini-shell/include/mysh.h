@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/time.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -40,6 +41,7 @@
 #include "facilities.h"
 #include "mysh_prompt.h"
 #include "cmdhandle.h"
+#include "cmdargs_parser.h"
 
 
 

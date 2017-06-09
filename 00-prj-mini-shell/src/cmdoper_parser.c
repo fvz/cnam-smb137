@@ -11,11 +11,10 @@
  * Le parser extrait d'abord un ensemble de 'cmdoper' comme suit :
  *
  * $  command1 > file || command2 < file2 && cmd3 | cmd4
- *    \______________/   \______________/   \___/  \___/
- *       cmdoper-1           cmdoper-2        |      \_cmdoper-4
- *                                            \_cmdoper-3
+ *    \______________/   \______________/   \__________/
+ *       cmdoper-1           cmdoper-2        cmdoper-4
  *
- * Les séquences || && | & sont considérés comme des opérateurs (et donc
+ * Les séquences '||', '&&', '&' sont considérées comme des opérateurs (et donc
  * comme des séparateurs dans la ligne de commande.)
  *
  * Ensuite, une liste chaînée est construite avec les cmdoper et leurs
@@ -29,22 +28,20 @@
  *       '--[.prev] --<-- CMDOPER-2 (opér[&&]) -->--[.next]-->--.
  *        ,----->---->----^                                     |
  *       |                                   v-----------------'
- *       '--[.prev] --<-- CMDOPER-3 (opér[|] ) -->--[.next]-->--.
- *        ,----->---->----^                                     |
- *       |                                   v-----------------'
- *       '--[.prev] --<-- CMDOPER-4 (opér[]) -->--[.next]--->---.
+ *       '--[.prev] --<-- CMDOPER-3 (opér[]) -->--[.next]--->---.
  *                                                              |
  *                                           X-----------------'
  *
  * Puis, pour chaque 'cmdoper', on utilise le même principe pour éclater la
  * commande du cmdoper en une liste chainée de 'cmdredir'. Dans cette 2ème
- * phase, les séparateurs sont maintenant :  >, >>, <, <<.
+ * phase, les séparateurs sont maintenant :  |, >, >>, <, <<.
  *
  * A la toute fin du parsing, on obtient donc une liste chaînée de 'cmdoper',
- * qui sont reliés par un opérateur ('||', '&&', '|' et '&'), et pour chacun
- * de ces 'cmdoper', on dispose d'une liste chaînée résultante de 'cmdredir'.
- * Ces cmdredir sont reliés entre eux par des redirecteurs ('>', '<', '>>',
+ * qui sont reliés par un opérateur ('||', '&&' ou '&'), et pour chacun de ces
+ * 'cmdoper', on dispose d'une liste chaînée résultante de 'cmdredir'. Ces
+ * cmdredir sont reliés entre eux par des redirecteurs ('|', '>', '<', '>>',
  * et '<<'.)
+ *
  */
 
 #include "typedef.h"
@@ -87,14 +84,12 @@ void cmdoper_free (cmdoper_p c) {
     }
 }
 
-void cmdoper_print_one (cmdoper_p c) {
+void cmdoper_print_one (mysh_context_p ctx, cmdoper_p c) {
     char *oper = NULL;
     if (c->oper == CMDOPER_EMPTY) {
         oper = strdup("");
     } else if (c->oper == CMDOPER_SEMICOLON) {
         oper = strdup(";");
-    } else if (c->oper == CMDOPER_PIPE) {
-        oper = strdup("|");
     } else if (c->oper == CMDOPER_OR) {
         oper = strdup("||");
     } else if (c->oper == CMDOPER_BACKGND) {
@@ -105,22 +100,24 @@ void cmdoper_print_one (cmdoper_p c) {
         oper = strdup("");
     }
 
-    printf ("[CMDOPER] cmd[%s] operator[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
-        c->cmd, oper, c->prev, c, c->next
-    );
-    cmdredir_print (c->redir);
+    ctx_dbmyprintf(1, ctx, "[cmdoper] cmd[%s] operator[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
+        c->cmd, oper, c->prev, c, c->next);
+    ctx_myprintf(1, ctx, "[cmdoper] cmd[%s] operator[%s]\n",
+        c->cmd, oper);
+
+    cmdredir_print (ctx, c->redir);
 
     freeif(oper);
 }
 
-void cmdoper_print (cmdoper_p c) {
+void cmdoper_print (mysh_context_p ctx, cmdoper_p c) {
     for( ; c!=NULL; c=c->next) {
-        cmdoper_print_one (c);
+        cmdoper_print_one (ctx, c);
     }
 }
 
 
-cmdoper_p cmdoper_parse (char *str) {
+cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
     int b_escape = false;
     int b_singleq = false;
@@ -138,15 +135,18 @@ cmdoper_p cmdoper_parse (char *str) {
 
     if (str == NULL || *str == '\0') { return NULL; }
 
+    ctx_myprintf(1, ctx, "[cmdoper_parser] Parse command line [%s]\n", str);
+    ctx_dbmyprintf(1, ctx, "[cmdoper_parser] Parse command line [%s]\n", str);
+
     bp = ep = str;
     cmdoper_cur = cmdoper_prev = cmdoper_first = NULL;
 
     for(cp=bp; *cp != '\0'; cp++) {
 
-        printf("[%c]\n", *cp);
+        ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Analyzing character [%c]\n", *cp);
 
         if (*cp == '\\') {
-            printf("Escaping car\n");
+            ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Escaping car\n", "");
             /* TODO  do no store the '\' char : use a temporary buffer */
             b_escape = true;
             continue;
@@ -190,9 +190,10 @@ cmdoper_p cmdoper_parse (char *str) {
                 oper = CMDOPER_SEMICOLON;
                 break;
             case '|':
-                b_cmdend = true;
-                oper = CMDOPER_PIPE;
-                if (b_pipeline && cmdoper_cur != NULL) { cmdoper_cur->oper = CMDOPER_OR; oper = CMDOPER_EMPTY;}
+                if (b_pipeline) {
+                    b_cmdend = true;
+                    oper = CMDOPER_OR;
+                }
                 b_pipeline = !b_pipeline;
                 break;
             case '&':
@@ -204,15 +205,10 @@ cmdoper_p cmdoper_parse (char *str) {
             case ' ':
                 break;
             default:
-                if (b_pipeline) {
-                    if (cmdoper_cur != NULL) { cmdoper_cur->oper = CMDOPER_PIPE; }
-                    b_pipeline = false;
-                }
                 if (b_ampersand) {
                     if (cmdoper_cur != NULL) { cmdoper_cur->oper = CMDOPER_BACKGND; }
                     b_ampersand = false;
                 }
-
                 if (!b_cmdstart) {
                     b_cmdstart = true;
                     bp = cp;
@@ -226,10 +222,9 @@ cmdoper_p cmdoper_parse (char *str) {
                 cmdoper_cur = cmdoper_new (strndup (bp, ep-bp+1), oper, cmdoper_prev, NULL);
                 if (cmdoper_prev != NULL) { cmdoper_prev->next = cmdoper_cur; }
                 if (cmdoper_first == NULL) { cmdoper_first = cmdoper_cur; }
-
-                oper = CMDOPER_EMPTY;
                 bp = cp+1;
             }
+            oper = CMDOPER_EMPTY;
             b_cmdstart = b_cmdend = false;
         }
     }
@@ -244,10 +239,9 @@ cmdoper_p cmdoper_parse (char *str) {
     return cmdoper_first;
 }
 
-
-void cmdoper_parse_redir (cmdoper_p c) {
-    while(c != NULL) {
-        c->redir = cmdredir_parse(c->cmd);
-        c = c->next;
+void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p c) {
+    for ( ; c != NULL; c = c->next) {
+        c->redir = cmdredir_parser(ctx, c->cmd);
+        cmdredir_parse_args (ctx, c->redir);
     }
 }

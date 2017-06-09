@@ -46,13 +46,23 @@ struct cmdredir_s {
     int redir;
     cmdredir_p prev;
     cmdredir_p next;
+
+    char **args;
+    int nargs;
+
+    int status;
 };
 
 #define CMDREDIR_EMPTY      0x00    /* empty redirection operator */
-#define CMDREDIR_TRUNCAT    0x01    /* >  : truncat redirection operator */
-#define CMDREDIR_APPEND     0x02    /* >> : append redirection operator */
-#define CMDREDIR_INPUT      0x04    /* <  : input redirection operator */
-#define CMDREDIR_DINPUT     0x08    /* << : ?? */
+#define CMDREDIR_PIPE       0x01    /* |  : pipe redirection operator */
+#define CMDREDIR_TRUNCAT    0x02    /* >  : truncat redirection operator */
+#define CMDREDIR_APPEND     0x04    /* >> : append redirection operator */
+#define CMDREDIR_INPUT      0x08    /* <  : input redirection operator */
+#define CMDREDIR_DINPUT     0x10    /* << : ?? */
+
+#define CMDREDIR_STATUS_INIT        0x00    /* object has been initialized */
+#define CMDREDIR_STATUS_PENDING     0x01    /* cmd has not been executed yet */
+#define CMDREDIR_STATUS_EXEC_OK     0x02    /* cmd has been executed */
 
 
 
@@ -66,14 +76,15 @@ struct cmdoper_s {
     cmdredir_p redir;
     cmdoper_p prev;
     cmdoper_p next;
+
+    int cmdstatus;
 };
 
 #define CMDOPER_EMPTY      0x00    /* empty operator */
 #define CMDOPER_SEMICOLON  0x01    /* ';'  : semicolon operator */
-#define CMDOPER_PIPE       0x02    /* '|'  : pipe operator */
-#define CMDOPER_OR         0x04    /* '||' : logic OR operator */
-#define CMDOPER_BACKGND    0x08    /* '&'  : background operator */
-#define CMDOPER_AND        0x10    /* '&&' : logic AND operator */
+#define CMDOPER_OR         0x02    /* '||' : logic OR operator */
+#define CMDOPER_BACKGND    0x04    /* '&'  : background operator */
+#define CMDOPER_AND        0x08    /* '&&' : logic AND operator */
 
 
 

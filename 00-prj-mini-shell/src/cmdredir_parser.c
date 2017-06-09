@@ -14,6 +14,8 @@ cmdredir_p cmdredir_new (char *cmd, int redir, cmdredir_p prev, cmdredir_p next)
     c->redir = redir;
     c->prev = prev;
     c->next = next;
+
+    c->status = CMDREDIR_STATUS_INIT;
     return c;
 }
 
@@ -22,16 +24,19 @@ void cmdredir_free (cmdredir_p c) {
     while (c) {
         tmp = c->next;
         freeif(c->cmd);
+        cmdargs_free(&(c->args));
         free(c);
         c = tmp;
     }
 }
 
-void cmdredir_print (cmdredir_p c) {
+void cmdredir_print (mysh_context_p ctx, cmdredir_p c) {
     while(c != NULL) {
         char *redir = NULL;
         if (c->redir == CMDREDIR_EMPTY) {
             redir = strdup("");
+        } else if (c->redir == CMDREDIR_PIPE) {
+            redir = strdup("|");
         } else if (c->redir == CMDREDIR_TRUNCAT) {
             redir = strdup(">");
         } else if (c->redir == CMDREDIR_APPEND) {
@@ -44,20 +49,22 @@ void cmdredir_print (cmdredir_p c) {
             redir = strdup("");
         }
 
-        printf ("[CMDREDIR] cmd[%s] redirection[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
-            c->cmd, redir, c->prev, c, c->next
-        );
+        ctx_dbmyprintf(1, ctx, "[cmdredir] cmd[%s] redirector[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
+            c->cmd, redir, c->prev, c, c->next);
+        ctx_myprintf(1, ctx, "[cmdredir] cmd[%s] redirector[%s]\n",
+            c->cmd, redir);
 
         freeif(redir);
         c = c->next;
     }
 }
 
-cmdredir_p cmdredir_parse (char *str) {
+cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
 
     int b_escape = false;
     int b_singleq = false;
     int b_doubleq = false;
+    int b_pipe = false;
     int b_gt = false;
     int b_lt = false;
 
@@ -76,10 +83,10 @@ cmdredir_p cmdredir_parse (char *str) {
 
     for(cp=bp; *cp != '\0'; cp++) {
 
-        //printf("[%c]\n", *cp);
+        ctx_dbmyprintf(2, ctx, "[cmdredir_parse] Analyzing character [%c]\n", *cp);
 
         if (*cp == '\\') {
-            printf("Escaping car\n");
+            ctx_dbmyprintf(2, ctx, "Escaping car\n", "");
             /* TODO  do no store the '\' char : use a temporary buffer */
             b_escape = true;
             continue;
@@ -118,6 +125,12 @@ cmdredir_p cmdredir_parse (char *str) {
         if (b_singleq || b_doubleq) { continue; }
 
         switch (*cp) {
+            case '|':
+                b_cmdend = true;
+                redir = CMDREDIR_PIPE;
+                if (b_pipe && cmdredir_cur != NULL) { redir = CMDREDIR_EMPTY;}
+                b_pipe = !b_pipe;
+                break;
             case '>':
                 b_cmdend = true;
                 redir = CMDREDIR_TRUNCAT;
@@ -133,6 +146,10 @@ cmdredir_p cmdredir_parse (char *str) {
             case ' ':
                 break;
             default:
+                if (b_pipe) {
+                    if (cmdredir_cur != NULL) { cmdredir_cur->redir = CMDREDIR_PIPE; }
+                    b_pipe = false;
+                }
                 if (b_gt) {
                     if (cmdredir_cur != NULL) { cmdredir_cur->redir = CMDREDIR_TRUNCAT; }
                     b_gt = false;
@@ -171,4 +188,10 @@ cmdredir_p cmdredir_parse (char *str) {
     }
 
     return cmdredir_first;
+}
+
+void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p c) {
+    for ( ; c != NULL; c = c->next) {
+        c->nargs = cmdargs_parser(ctx, c->cmd, &(c->args));
+    }
 }
