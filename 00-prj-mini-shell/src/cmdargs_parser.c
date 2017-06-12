@@ -54,11 +54,17 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
     int b_start = false;
     int b_end = false;
 
+    char *buff;
+    int ibuff;
+
     char *bp, *cp, *ep;
     bp = ep = str;
 
     ctx_myprintf(1, ctx, "[cmdargs_parser] Parse arguments of command line [%s]\n", str);
     ctx_dbmyprintf(1, ctx, "[cmdargs_parser] Parse arguments of command line [%s]\n", str);
+
+    buff = strndup(str, strlen(str));
+    ibuff = 0;
 
     ielt = 0; nelt = 1;
     (*array) = (char**) malloc (nelt * sizeof(char*));
@@ -140,6 +146,9 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
                 if (!b_in_singleq && !b_in_doubleq) {
                     printf("#1\n");
                     b_end = true;
+                } else {
+                    /* TODO : fix case of :   echo "a b" c d    arg1="a b "  */
+                    buff[ibuff++] = *cp;
                 }
                 if (b_singleq && b_in_singleq) {
                     printf("#2\n");
@@ -147,12 +156,13 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
                     b_in_singleq = false;
                     b_end = true;
                 }
-                if (b_in_doubleq && b_in_doubleq) {
+                if (b_doubleq && b_in_doubleq) {
                     printf("#3\n");
                     b_doubleq = false;
                     b_in_doubleq = false;
                     b_end = true;
                 }
+
                 break;
 
             default:
@@ -168,6 +178,7 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
                     b_start = true;
                     bp = cp;
                 }
+                buff[ibuff++] = *cp;
 
                 ep = cp;
                 break;
@@ -179,7 +190,12 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
         if (b_end) {
             if (b_start) {
                 (*array) = realloc (*array, ++nelt * sizeof(char**));
-                (*array)[ielt] = strndup (bp, ep-bp+1);
+                //(*array)[ielt] = strndup (bp, ep-bp+1);
+                buff[ibuff++] = '\0';
+                printf("ARGS=[%s]\n", buff);
+                (*array)[ielt] = strndup (buff, ibuff);
+                ibuff = 0;
+
                 ctx_dbmyprintf(2, ctx, "[cmdargs_parser] New #%d argument [%s]\n", ielt+1, (*array)[ielt]);
                 ielt++;
 
@@ -193,10 +209,16 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
 
     if (b_start) {
         (*array) = realloc (*array, ++nelt * sizeof(char**));
-        (*array)[ielt] = strndup (bp, ep-bp+1);
+        //(*array)[ielt] = strndup (bp, ep-bp+1);
+        buff[ibuff++] = '\0';
+        printf("ARGS=[%s]\n", buff);
+        (*array)[ielt] = strndup (buff, ibuff);
+        ibuff = 0;
         ctx_dbmyprintf(2, ctx, "[cmdargs_parser] New #%d argument [%s]\n", ielt+1, (*array)[ielt]);
         ielt++;
     }
+
+    free(buff);
 
     (*array)[ielt] = NULL;
     ctx_dbmyprintf(1, ctx, "[cmdargs_parser] End of parser : found %d arguments\n", ielt);
