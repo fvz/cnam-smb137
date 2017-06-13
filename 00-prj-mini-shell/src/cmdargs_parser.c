@@ -60,78 +60,44 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
     char *bp, *cp, *ep;
     bp = ep = str;
 
-    ctx_myprintf(1, ctx, "[cmdargs_parser] Parse arguments of command line [%s]\n", str);
-    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] Parse arguments of command line [%s]\n", str);
+    ctx_myprintf(1, ctx, "[cmdargs_parser] Parse args of cmdline [%s]\n", str);
+    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] Parse args of cmdline [%s]\n", str);
 
-    buff = strndup(str, strlen(str));
+    buff = (char*) malloc (strlen(str) * sizeof(char));
     ibuff = 0;
 
     ielt = 0; nelt = 1;
     (*array) = (char**) malloc (nelt * sizeof(char*));
 
+    ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Cursor string is on [%s]\n", bp);
     for(cp=bp; *cp != '\0'; cp++) {
+
+        ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Analyzing character [%c]\n", *cp);
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "Escaping car\n", "");
-            /* TODO  do no store the '\' char : use a temporary buffer */
             b_escape = true;
+            /* FIXME: seems to be not working :
+                echo "a \"b c"  =>  arg1=[a "b c]
+                echo "a \"b     =>  arg1=[a "b]
+            */
             continue;
         }
-/*
-        switch (*cp) {
-            case '\'':
-                if (!b_escape) {
-                    if (!b_start) {
-                        b_start = true;
-                        bp = cp;
-                    }
-                    ep = cp;
 
-                    b_singleq = !b_singleq;
-                } else {
-                    continue;
-                }
-                break;
-            case '"':
-                if (!b_escape) {
-                    if (!b_start) {
-                        b_start = true;
-                        bp = cp;
-                    }
-                    ep = cp;
-
-                    b_doubleq = !b_doubleq;
-                } else {
-                    continue;
-                }
-                break;
-            default:
-                break;
-        }
-
-        if (b_escape) { b_escape = false; continue; }
-        if (b_singleq || b_doubleq) { continue; }
-
-        switch (*cp) {
-            case ' ':
-                b_end = true;
-                break;
-            default:
-                if (!b_start) {
-                    b_start = true;
-                    bp = cp;
-                }
-                ep = cp;
-        }
-*/
-
-        //printf("[%c]\n", *cp);
+        /*** Some specials cases of handling arguments ***
+            echo "a b " " c d"  =>  arg1=[a b ]  arg2=[ c d]
+            echo "a b ""c d"    =>  arg1=[a b c d]
+            echo "a b "c        =>  arg1=[a b c]
+            echo "a b"c         =>  arg1=[a bc]
+            echo "a b" c        =>  arg1=[a b]  arg2=[c]
+        */
 
         switch (*cp) {
             case '\'':
                 if (b_escape) {
                     continue;
                 } else {
+                    if (b_singleq) { b_in_singleq = false; }
                     b_singleq = true;
                 }
                 break;
@@ -139,30 +105,25 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
                 if (b_escape) {
                     continue;
                 } else {
+                    if (b_doubleq) { b_in_doubleq = false; }
                     b_doubleq = true;
                 }
                 break;
             case ' ':
-                if (!b_in_singleq && !b_in_doubleq) {
-                    printf("#1\n");
-                    b_end = true;
-                } else {
-                    /* TODO : fix case of :   echo "a b" c d    arg1="a b "  */
-                    buff[ibuff++] = *cp;
-                }
-                if (b_singleq && b_in_singleq) {
-                    printf("#2\n");
+                if (!b_in_singleq && !b_in_doubleq
+                    && !b_singleq && !b_doubleq) {
+                        b_end = true;
+                } else if (b_singleq && b_in_singleq) {
                     b_singleq = false;
                     b_in_singleq = false;
                     b_end = true;
-                }
-                if (b_doubleq && b_in_doubleq) {
-                    printf("#3\n");
+                } else if (b_doubleq && b_in_doubleq) {
                     b_doubleq = false;
                     b_in_doubleq = false;
                     b_end = true;
+                } else {
+                    buff[ibuff++] = *cp;
                 }
-
                 break;
 
             default:
@@ -190,16 +151,15 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
         if (b_end) {
             if (b_start) {
                 (*array) = realloc (*array, ++nelt * sizeof(char**));
-                //(*array)[ielt] = strndup (bp, ep-bp+1);
                 buff[ibuff++] = '\0';
-                printf("ARGS=[%s]\n", buff);
                 (*array)[ielt] = strndup (buff, ibuff);
                 ibuff = 0;
 
-                ctx_dbmyprintf(2, ctx, "[cmdargs_parser] New #%d argument [%s]\n", ielt+1, (*array)[ielt]);
+                ctx_dbmyprintf(2, ctx, "[cmdargs_parser] Found new #%d argument [%s]\n", ielt+1, (*array)[ielt]);
                 ielt++;
 
                 bp = cp+1;
+                ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Cursor string is on [%s]\n", bp);
             }
             b_start = b_end = false;
             b_singleq = b_doubleq = false;
@@ -209,18 +169,16 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
 
     if (b_start) {
         (*array) = realloc (*array, ++nelt * sizeof(char**));
-        //(*array)[ielt] = strndup (bp, ep-bp+1);
         buff[ibuff++] = '\0';
-        printf("ARGS=[%s]\n", buff);
         (*array)[ielt] = strndup (buff, ibuff);
         ibuff = 0;
-        ctx_dbmyprintf(2, ctx, "[cmdargs_parser] New #%d argument [%s]\n", ielt+1, (*array)[ielt]);
+        ctx_dbmyprintf(2, ctx, "[cmdargs_parser] Found new #%d argument [%s]\n", ielt+1, (*array)[ielt]);
         ielt++;
     }
 
     free(buff);
 
     (*array)[ielt] = NULL;
-    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] End of parser : found %d arguments\n", ielt);
+    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] End of parser. This cmd [%s] give %d arguments.\n", str, ielt);
     return ielt;
 }

@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 				mysh_prompt_release(ctx);
 			}
 		}
+		ctx_dbmyprintf(1, ctx, "[main] End of main loop (ctx = CTX_STATUS_EXIT).\n");
     }
 
     mysh_history_flush(ctx);

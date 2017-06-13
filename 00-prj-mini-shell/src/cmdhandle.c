@@ -24,6 +24,7 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
 	mycmdoper = cmdoper_parser (ctx, cmdline);
 	cmdoper_parse_redir (ctx, mycmdoper);
 
+	ctx_dbmyprintf(1, ctx, "[cmdhandle] === Starting the handling engine ===\n");
 
 	/* for all cmdoper */
 	for(o=mycmdoper; o != NULL; o=o->next) {
@@ -37,10 +38,13 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
 			char *a = r->args[0]; /* just a shortcut */
 			ctx_dbmyprintf(1, ctx, "[cmdhandle] Handling redirection [%s]\n", a);
 
+			if (ctx->status == CTX_STATUS_EXIT) {
+				ctx_dbmyprintf(1, ctx, "[cmdhandle] Currently in exiting workflow. Ignoring [%s] command.\n", o->cmd);
+				continue;
+			}
 
 			if (strcmp(a, "exit") == 0) {
 				ctx_dbmyprintf(1, ctx, "[cmdhandle] 'exit' command found.\n");
-
 				if (o->prev) {
 					if ((o->prev->oper == CMDOPER_AND) && (o->prev->cmdstatus == true)) {
 						ctx_dbmyprintf(1, ctx, "[cmdhandle] Prev Operator=AND and ReturnCode=true. OK for exiting.\n", r->cmd);
@@ -61,7 +65,7 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
 				}
 			} else {
 
-
+				printf("===CHILD / FORK ===\n");
 				if (r->prev == NULL) {
 					int status = 0;
 					pid_t child;
@@ -73,11 +77,10 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
 					} else {
 						waitpid(child, &status, 0);
 					}
+
 				}
 			}
 
-
-//printf("OK\n");
 
 
 /*

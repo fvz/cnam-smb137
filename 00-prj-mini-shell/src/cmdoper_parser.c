@@ -135,15 +135,16 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
     if (str == NULL || *str == '\0') { return NULL; }
 
-    ctx_myprintf(1, ctx, "[cmdoper_parser] Parse command line [%s]\n", str);
-    ctx_dbmyprintf(1, ctx, "[cmdoper_parser] Parse command line [%s]\n", str);
+    ctx_myprintf(1, ctx, "[cmdoper_parser] Parse cmdline [%s]\n", str);
+    ctx_dbmyprintf(1, ctx, "[cmdoper_parser] Parse cmdline [%s]\n", str);
 
     bp = ep = str;
     cmdoper_cur = cmdoper_prev = cmdoper_first = NULL;
 
+    ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Cursor string is on [%s]\n", bp);
     for(cp=bp; *cp != '\0'; cp++) {
 
-        ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Analyzing character [%c]\n", *cp);
+        ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Analyzing character [%c]\n", *cp);
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Escaping car\n", "");
@@ -223,6 +224,7 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
                 if (cmdoper_prev != NULL) { cmdoper_prev->next = cmdoper_cur; }
                 if (cmdoper_first == NULL) { cmdoper_first = cmdoper_cur; }
                 bp = cp+1;
+                ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Cursor string is on [%s]\n", bp);
             }
             oper = CMDOPER_EMPTY;
             b_cmdstart = b_cmdend = false;
