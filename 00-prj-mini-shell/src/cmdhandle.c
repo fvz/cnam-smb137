@@ -44,7 +44,7 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                 continue;
             }
 
-            if (!builtin_loop_scan (ctx, o, r)) {
+            if (!builtin_loop_scan (ctx, r)) {
                 printf("===CHILD / FORK ===\n");
                 if (r->prev == NULL) {
                     int status = 0;
