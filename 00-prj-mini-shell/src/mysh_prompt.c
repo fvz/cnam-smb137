@@ -9,6 +9,25 @@
 
 
 /**
+ * \fn void mysh_prompt_set_with_new(mysh_context_p ctx, char *prompt)
+ * \brief Redéfinition du prompt à afficher (il est stocké dans le contexte)
+ *
+ * \param ctx Pointeur sur l'objet mysh_context
+ * \param prompt Nouveau prompt à afficher
+ *
+ * Cette fonction est identique à mysh_prompt_set() à ceci près qu'elle
+ * attend un pointeur sur une chaine nouvellement allouée. Elle assigne
+ * le prompt à ce pointeur. Après l'appel de cette fonction, il ne faudra
+ * donc en aucun cas libérer cette nouvelle chaine.
+ */
+void mysh_prompt_set_with_new(mysh_context_p ctx, char *prompt) {
+	if (ctx != NULL) {
+		freeif(ctx->prompt);
+		ctx->prompt = prompt;
+	}
+}
+
+/**
  * \fn void mysh_prompt_set(mysh_context_p ctx, char *prompt)
  * \brief Redéfinition du prompt à afficher (il est stocké dans le contexte)
  *
@@ -17,8 +36,7 @@
  */
 void mysh_prompt_set(mysh_context_p ctx, char *prompt) {
 	if (ctx != NULL) {
-		freeif(ctx->prompt);
-		ctx->prompt = prompt ? strndup(prompt, strlen(prompt)) : NULL;
+		mysh_prompt_set_with_new(ctx, prompt ? strndup(prompt, strlen(prompt)) : NULL);
 	}
 }
 

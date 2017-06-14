@@ -57,8 +57,9 @@ void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
                     ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, r->args[1]);
                     /* we have changed of directory :
                     we can set the new directory in the shell prompt */
-                    mysh_prompt_set(ctx, r->args[1]);
+                    mysh_prompt_set_with_new(ctx, strcat_dup(r->args[1], "#"));
                 } else {
+                    /* TODO : errno + details */
                     ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_ERR);
                     ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_ERR_DETAILS, result);
                 }
