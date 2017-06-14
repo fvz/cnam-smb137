@@ -3,6 +3,7 @@
 
 #include "mysh.h"
 
+int builtin_loop_scan (mysh_context_p ctx, cmdoper_p o, cmdredir_p r);
 
 void builtin_cmd_exit (mysh_context_p ctx, cmdoper_p oper);
 void builtin_cmd_echo (mysh_context_p ctx, cmdoper_p oper);

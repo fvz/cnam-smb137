@@ -37,25 +37,14 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
         /* for all cmdredir of each cmdoper */
         for(r=o->redir; r != NULL; r=r->next) {
 
-            char *a = r->args[0]; /* just a shortcut */
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_HANDLING_REDIR, a);
+            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_HANDLING_REDIR, r->args[0]);
 
             if (ctx->status == CTX_STATUS_EXIT) {
                 ctx_dbmyprintf(1, ctx, M_CMDHANDLE_IN_EXITING_WF, o->cmd);
                 continue;
             }
 
-            int i;
-            int builtin_found = false;
-            for(i=0; builtin_list[i].cb != NULL; i++) {
-                if (strcmp(a, builtin_list[i].cmd) == 0) {
-                    builtin_list[i].cb(ctx, o);
-                    builtin_found = true;
-                    break;
-                }
-            }
-
-            if (!builtin_found) {
+            if (!builtin_loop_scan (ctx, o, r)) {
                 printf("===CHILD / FORK ===\n");
                 if (r->prev == NULL) {
                     int status = 0;
