@@ -33,6 +33,32 @@ int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r) {
 }
 
 /**
+ * \fn void builtin_cmd_cd (mysh_context_p ctx, cmdoper_p oper)
+ * \brief Commande Built-in "cd" : elle fait changer de dossier courant.
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
+
+    /* TODO */
+
+}
+
+/**
+ * \fn void builtin_cmd_pwd (mysh_context_p ctx, cmdoper_p oper)
+ * \brief Commande Built-in "pwd" : affiche var. contenant chemin répertoire courant
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+void builtin_cmd_pwd (mysh_context_p ctx, cmdredir_p r) {
+
+    /* TODO */
+
+}
+
+/**
  * \fn void builtin_cmd_exit (mysh_context_p ctx, cmdoper_p oper)
  * \brief Commande Built-in "exit" : elle fait quitter le programme.
  *
