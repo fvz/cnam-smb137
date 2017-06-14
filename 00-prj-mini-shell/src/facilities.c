@@ -32,8 +32,8 @@ void freeif(void* to_free)
 char* strcat_dup(const char *s1, const char *s2) {
     int len1, len2;
     char *new;
-    len1 = str1 ? strlen(s1) : 0;
-    len2 = str2 ? strlen(s2) : 0;
+    len1 = s1 ? strlen(s1) : 0;
+    len2 = s2 ? strlen(s2) : 0;
     new = malloc(len1 + len2 + 1); *new = '\0';
     if (s1) { memcpy(new,        s1, len1 + 1); }
     if (s2) { memcpy(new + len1, s2, len2 + 1); }
