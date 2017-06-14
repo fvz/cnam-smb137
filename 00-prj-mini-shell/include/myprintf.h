@@ -36,7 +36,7 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDARGS_PARSER_CURSOR_IS      M_CMDARGS_PARSER" "M_COMMON_CURSOR_IS"\n"
 #define M_CMDARGS_PARSER_ANALYZE_CHAR   M_CMDARGS_PARSER" "M_COMMON_ANALYZE_CHAR"\n"
 #define M_CMDARGS_PARSER_FOUND_ARG      M_CMDARGS_PARSER" Found new #%d argument [%s]\n"
-#define M_CMDARGS_PARSER_END_GIVE_ARG   M_CMDARGS_PARSER" End of parser. This cmd [%s] give %d arguments.\n"
+#define M_CMDARGS_PARSER_END_GIVE_ARG   M_CMDARGS_PARSER" End of parser. This cmd [%s] give %d argument(s).\n"
 
 /* cmdoper_parser messages */
 #define M_CMDOPER_PARSER                "[cmdoper]"
