@@ -76,7 +76,7 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_OKEXIT_OPER_AND     M_CMDHANDLE" Prev Operator=AND and ReturnCode=true. "M_CMDHANDLE_OK4EXIT"\n"
 #define M_CMDHANDLE_OKEXIT_OPER_OR      M_CMDHANDLE" Prev Operator=OR and ReturnCode=false. "M_CMDHANDLE_OK4EXIT"\n"
 #define M_CMDHANDLE_OKEXIT_OPER_SCOLON  M_CMDHANDLE" Prev Operator=SEMICOLON. "M_CMDHANDLE_OK4EXIT"\n"
-#define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command. "M_CMDHANDLE_OK4EXIT".\n"
+#define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command. "M_CMDHANDLE_OK4EXIT"\n"
 
 
 #endif /* MYPRINTF_H_ */
