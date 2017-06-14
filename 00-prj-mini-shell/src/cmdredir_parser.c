@@ -2,62 +2,64 @@
 #include "cmdredir_parser.h"
 
 
-cmdredir_p cmdredir_new (char *cmd, int redir, cmdredir_p prev, cmdredir_p next) {
+cmdredir_p cmdredir_new (cmdoper_p oper, char *cmd, int redir, cmdredir_p prev, cmdredir_p next) {
 
-    cmdredir_p c;
-    if (!(c = (cmdredir_p) malloc (sizeof(cmdredir_t)))) {
+    cmdredir_p r;
+    if (!(r = (cmdredir_p) malloc (sizeof(cmdredir_t)))) {
         perror("malloc of cmdredir element.");
 		return NULL;
     }
 
-    c->cmd = cmd;
-    c->redir = redir;
-    c->prev = prev;
-    c->next = next;
+    r->oper = oper;
 
-    c->status = CMDREDIR_STATUS_INIT;
-    return c;
+    r->cmd = cmd;
+    r->redir = redir;
+    r->prev = prev;
+    r->next = next;
+
+    r->status = CMDREDIR_STATUS_INIT;
+    return r;
 }
 
-void cmdredir_free (cmdredir_p c) {
+void cmdredir_free (cmdredir_p r) {
     cmdredir_p tmp;
-    while (c) {
-        tmp = c->next;
-        freeif(c->cmd);
-        cmdargs_free(&(c->args));
-        free(c);
-        c = tmp;
+    while (r) {
+        tmp = r->next;
+        freeif(r->cmd);
+        cmdargs_free(&(r->args));
+        free(r);
+        r = tmp;
     }
 }
 
-void cmdredir_print (mysh_context_p ctx, cmdredir_p c) {
-    while(c != NULL) {
+void cmdredir_print (mysh_context_p ctx, cmdredir_p r) {
+    for ( ; r != NULL; r = r->next) {
+
         char *redir = NULL;
-        if (c->redir == CMDREDIR_EMPTY) {
+        if (r->redir == CMDREDIR_EMPTY) {
             redir = strdup("");
-        } else if (c->redir == CMDREDIR_PIPE) {
+        } else if (r->redir == CMDREDIR_PIPE) {
             redir = strdup("|");
-        } else if (c->redir == CMDREDIR_TRUNCAT) {
+        } else if (r->redir == CMDREDIR_TRUNCAT) {
             redir = strdup(">");
-        } else if (c->redir == CMDREDIR_APPEND) {
+        } else if (r->redir == CMDREDIR_APPEND) {
             redir = strdup(">>");
-        } else if (c->redir == CMDREDIR_INPUT) {
+        } else if (r->redir == CMDREDIR_INPUT) {
             redir = strdup("<");
-        } else if (c->redir == CMDREDIR_DINPUT) {
+        } else if (r->redir == CMDREDIR_DINPUT) {
             redir = strdup("<<");
         } else {
             redir = strdup("");
         }
 
-        ctx_dbmyprintf(1, ctx, M_CMDREDIR_PARSER_PRINT_PTR, c->cmd, redir, c->prev, c, c->next);
-        ctx_myprintf(1, ctx, M_CMDREDIR_PARSER_PRINT, c->cmd, redir);
+        ctx_dbmyprintf(1, ctx, M_CMDREDIR_PARSER_PRINT_PTR, r->cmd, redir, r->prev, r, r->next);
+        ctx_myprintf(1, ctx, M_CMDREDIR_PARSER_PRINT, r->cmd, redir);
 
         freeif(redir);
-        c = c->next;
     }
 }
 
-cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
+cmdredir_p cmdredir_parser (mysh_context_p ctx, cmdoper_p oper) {
 
     int b_escape = false;
     int b_singleq = false;
@@ -74,9 +76,9 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
 
     cmdredir_p cmdredir_cur, cmdredir_prev, cmdredir_first;
 
-    if (str == NULL || *str == '\0') { return NULL; }
+    if ((oper->cmd == NULL) || ((oper->cmd)[0] == '\0')) { return NULL; }
 
-    bp = ep = str;
+    bp = ep = oper->cmd;
     cmdredir_cur = cmdredir_prev = cmdredir_first = NULL;
 
     for(cp=bp; *cp != '\0'; cp++) {
@@ -167,7 +169,7 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
         if (b_cmdend) {
             if (b_cmdstart) {
                 if (cmdredir_cur) { cmdredir_prev = cmdredir_cur; }
-                cmdredir_cur = cmdredir_new (strndup (bp, ep-bp+1), redir, cmdredir_prev, NULL);
+                cmdredir_cur = cmdredir_new (oper, strndup (bp, ep-bp+1), redir, cmdredir_prev, NULL);
                 if (cmdredir_prev != NULL) { cmdredir_prev->next = cmdredir_cur; }
                 if (cmdredir_first == NULL) { cmdredir_first = cmdredir_cur; }
 
@@ -180,7 +182,7 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
 
     if (b_cmdstart) {
         if (cmdredir_cur) { cmdredir_prev = cmdredir_cur; }
-        cmdredir_cur = cmdredir_new (strndup (bp, cp-bp+1), redir, cmdredir_prev, NULL);
+        cmdredir_cur = cmdredir_new (oper, strndup (bp, cp-bp+1), redir, cmdredir_prev, NULL);
         if (cmdredir_prev != NULL) { cmdredir_prev->next = cmdredir_cur; }
         if (cmdredir_first == NULL) { cmdredir_first = cmdredir_cur; }
     }
@@ -188,8 +190,8 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
     return cmdredir_first;
 }
 
-void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p c) {
-    for ( ; c != NULL; c = c->next) {
-        c->nargs = cmdargs_parser(ctx, c->cmd, &(c->args));
+void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p r) {
+    for ( ; r != NULL; r = r->next) {
+        r->nargs = cmdargs_parser(ctx, r->cmd, &(r->args));
     }
 }

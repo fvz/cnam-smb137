@@ -38,21 +38,30 @@ struct mysh_context_s {
 #define CTX_STATUS_LOOP     0x01    /* program in looping stage */
 
 
+/* cmdredir types */
+typedef struct cmdredir_s cmdredir_t;
+typedef cmdredir_t* cmdredir_p;
+
+/* cmdoper types */
+typedef struct cmdoper_s cmdoper_t;
+typedef cmdoper_t* cmdoper_p;
+
 
 /* cmdredir : a command redirection (string of command associated to a redirection operator like '>', '>>', '<', '<<')
  */
-typedef struct cmdredir_s cmdredir_t;
-typedef cmdredir_t* cmdredir_p;
 struct cmdredir_s {
-    char *cmd;
-    int redir;
-    cmdredir_p prev;
-    cmdredir_p next;
 
-    char **args;
-    int nargs;
+    cmdoper_p oper;     /* cmdoper 'parent' of the cmdredir chain */
 
-    int status;
+    char *cmd;          /* command of this cmdredir */
+    int redir;          /* type of redirector */
+    cmdredir_p prev;    /* previous cmdredir in the 'redir' chain */
+    cmdredir_p next;    /* and next ... */
+
+    char **args;        /* array of arguments (1st (command) is also an argument) */
+    int nargs;          /* number of arguments */
+
+    int status;         /* return code of executed command */
 };
 
 #define CMDREDIR_EMPTY      0x00    /* empty redirection operator */
@@ -70,8 +79,6 @@ struct cmdredir_s {
 
 /* cmdoper : a command operator  (string of command associated to an operator like '&&', '||', '|', '&')
  */
-typedef struct cmdoper_s cmdoper_t;
-typedef cmdoper_t* cmdoper_p;
 struct cmdoper_s {
     char *cmd;
     int oper;

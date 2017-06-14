@@ -68,6 +68,7 @@ cmdoper_p cmdoper_new (char *cmd, int oper, cmdoper_p prev, cmdoper_p next) {
 
     c->cmd = cmd;
     c->oper = oper;
+    c->redir = NULL;
     c->prev = prev;
     c->next = next;
     return c;
@@ -240,7 +241,7 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
 void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p c) {
     for ( ; c != NULL; c = c->next) {
-        c->redir = cmdredir_parser(ctx, c->cmd);
+        c->redir = cmdredir_parser(ctx, c);
         cmdredir_parse_args (ctx, c->redir);
     }
 }
