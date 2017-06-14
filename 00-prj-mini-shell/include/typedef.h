@@ -80,13 +80,13 @@ struct cmdredir_s {
 /* cmdoper : a command operator  (string of command associated to an operator like '&&', '||', '|', '&')
  */
 struct cmdoper_s {
-    char *cmd;
-    int oper;
-    cmdredir_p redir;
-    cmdoper_p prev;
-    cmdoper_p next;
+    char *cmd;          /* command of this cmdoper */
+    int type;           /* type of cmdoper */
+    cmdredir_p redir;   /* chainlist of cmdredir */
+    cmdoper_p prev;     /* previous cmdoper in the 'oper' chain */
+    cmdoper_p next;     /* and next ... */
 
-    int cmdstatus;
+    int cmdstatus;      /* return code of command */
 };
 
 #define CMDOPER_EMPTY      0x00    /* empty operator */

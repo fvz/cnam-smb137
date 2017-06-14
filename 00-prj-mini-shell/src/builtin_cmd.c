@@ -41,14 +41,15 @@ int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r) {
  */
 void builtin_cmd_exit (mysh_context_p ctx, cmdredir_p r) {
 
-    if (r && r->oper && r->oper->prev) {
-        if ((r->oper->prev->oper == CMDOPER_AND) && (r->oper->prev->cmdstatus == true)) {
+    cmdoper_p oprev;
+    if (r && r->oper && ((oprev = r->oper->prev) != NULL)) {
+        if ((oprev->type == CMDOPER_AND) && (oprev->cmdstatus == true)) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
             ctx->status = CTX_STATUS_EXIT;
-        } else if ((r->oper->prev->oper == CMDOPER_OR) && (r->oper->prev->cmdstatus == false)) {
+        } else if ((oprev->type == CMDOPER_OR) && (oprev->cmdstatus == false)) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
             ctx->status = CTX_STATUS_EXIT;
-        } else if (r->oper->prev->oper == CMDOPER_SEMICOLON) {
+        } else if (oprev->type == CMDOPER_SEMICOLON) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
             ctx->status = CTX_STATUS_EXIT;
         } else {

@@ -58,60 +58,60 @@
  * \param next Element cmdoper suivant (dans la liste chaînée)
  * \return nouvel élément cmdoper alloué
  */
-cmdoper_p cmdoper_new (char *cmd, int oper, cmdoper_p prev, cmdoper_p next) {
+cmdoper_p cmdoper_new (char *cmd, int type, cmdoper_p prev, cmdoper_p next) {
 
-    cmdoper_p c;
-    if (!(c = (cmdoper_p) malloc (sizeof(cmdoper_t)))) {
+    cmdoper_p o;
+    if (!(o = (cmdoper_p) malloc (sizeof(cmdoper_t)))) {
         perror("malloc of cmdoper element.");
 		return NULL;
     }
 
-    c->cmd = cmd;
-    c->oper = oper;
-    c->redir = NULL;
-    c->prev = prev;
-    c->next = next;
-    return c;
+    o->cmd = cmd;
+    o->type = type;
+    o->redir = NULL;
+    o->prev = prev;
+    o->next = next;
+    return o;
 }
 
-void cmdoper_free (cmdoper_p c) {
+void cmdoper_free (cmdoper_p o) {
     cmdoper_p tmp;
-    while (c) {
-        tmp = c->next;
-        freeif(c->cmd);
-        if (c->redir) { cmdredir_free(c->redir); }
-        free(c);
-        c = tmp;
+    while (o) {
+        tmp = o->next;
+        freeif(o->cmd);
+        if (o->redir) { cmdredir_free(o->redir); }
+        free(o);
+        o = tmp;
     }
 }
 
-void cmdoper_print_one (mysh_context_p ctx, cmdoper_p c) {
-    char *oper = NULL;
-    if (c->oper == CMDOPER_EMPTY) {
-        oper = strdup("");
-    } else if (c->oper == CMDOPER_SEMICOLON) {
-        oper = strdup(";");
-    } else if (c->oper == CMDOPER_OR) {
-        oper = strdup("||");
-    } else if (c->oper == CMDOPER_BACKGND) {
-        oper = strdup("&");
-    } else if (c->oper == CMDOPER_AND) {
-        oper = strdup("&&");
+void cmdoper_print_one (mysh_context_p ctx, cmdoper_p o) {
+    char *type_str = NULL;
+    if (o->type == CMDOPER_EMPTY) {
+        type_str = strdup("");
+    } else if (o->type == CMDOPER_SEMICOLON) {
+        type_str = strdup(";");
+    } else if (o->type == CMDOPER_OR) {
+        type_str = strdup("||");
+    } else if (o->type == CMDOPER_BACKGND) {
+        type_str = strdup("&");
+    } else if (o->type == CMDOPER_AND) {
+        type_str = strdup("&&");
     } else {
-        oper = strdup("");
+        type_str = strdup("");
     }
 
-    ctx_dbmyprintf(1, ctx, M_CMDOPER_PARSER_PRINT_PTR, c->cmd, oper, c->prev, c, c->next);
-    ctx_myprintf(1, ctx, M_CMDOPER_PARSER_PRINT, c->cmd, oper);
+    ctx_dbmyprintf(1, ctx, M_CMDOPER_PARSER_PRINT_PTR, o->cmd, type_str, o->prev, o, o->next);
+    ctx_myprintf(1, ctx, M_CMDOPER_PARSER_PRINT, o->cmd, type_str);
 
-    cmdredir_print (ctx, c->redir);
+    cmdredir_print (ctx, o->redir);
 
-    freeif(oper);
+    freeif(type_str);
 }
 
-void cmdoper_print (mysh_context_p ctx, cmdoper_p c) {
-    for( ; c!=NULL; c=c->next) {
-        cmdoper_print_one (ctx, c);
+void cmdoper_print (mysh_context_p ctx, cmdoper_p o) {
+    for( ; o!=NULL; o=o->next) {
+        cmdoper_print_one (ctx, o);
     }
 }
 
@@ -126,7 +126,7 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
     int b_cmdstart = false;
     int b_cmdend = false;
 
-    int oper = CMDOPER_EMPTY;
+    int type = CMDOPER_EMPTY;
     char *bp, *cp, *ep; /* begin/cur/end pointers */
 
     cmdoper_p cmdoper_cur, cmdoper_prev, cmdoper_first;
@@ -186,26 +186,26 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
         switch (*cp) {
             case ';':
                 b_cmdend = true;
-                oper = CMDOPER_SEMICOLON;
+                type = CMDOPER_SEMICOLON;
                 break;
             case '|':
                 if (b_pipeline) {
                     b_cmdend = true;
-                    oper = CMDOPER_OR;
+                    type = CMDOPER_OR;
                 }
                 b_pipeline = !b_pipeline;
                 break;
             case '&':
                 b_cmdend = true;
-                oper = CMDOPER_BACKGND;
-                if (b_ampersand && cmdoper_cur != NULL) { cmdoper_cur->oper = CMDOPER_AND; oper = CMDOPER_EMPTY;}
+                type = CMDOPER_BACKGND;
+                if (b_ampersand && cmdoper_cur != NULL) { cmdoper_cur->type = CMDOPER_AND; type = CMDOPER_EMPTY;}
                 b_ampersand = !b_ampersand;
                 break;
             case ' ':
                 break;
             default:
                 if (b_ampersand) {
-                    if (cmdoper_cur != NULL) { cmdoper_cur->oper = CMDOPER_BACKGND; }
+                    if (cmdoper_cur != NULL) { cmdoper_cur->type = CMDOPER_BACKGND; }
                     b_ampersand = false;
                 }
                 if (!b_cmdstart) {
@@ -218,20 +218,20 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
         if (b_cmdend) {
             if (b_cmdstart) {
                 if (cmdoper_cur) { cmdoper_prev = cmdoper_cur; }
-                cmdoper_cur = cmdoper_new (strndup (bp, ep-bp+1), oper, cmdoper_prev, NULL);
+                cmdoper_cur = cmdoper_new (strndup (bp, ep-bp+1), type, cmdoper_prev, NULL);
                 if (cmdoper_prev != NULL) { cmdoper_prev->next = cmdoper_cur; }
                 if (cmdoper_first == NULL) { cmdoper_first = cmdoper_cur; }
                 bp = cp+1;
                 ctx_dbmyprintf(3, ctx, M_CMDOPER_PARSER_CURSOR_IS, bp);
             }
-            oper = CMDOPER_EMPTY;
+            type = CMDOPER_EMPTY;
             b_cmdstart = b_cmdend = false;
         }
     }
 
     if (b_cmdstart) {
         if (cmdoper_cur) { cmdoper_prev = cmdoper_cur; }
-        cmdoper_cur = cmdoper_new (strndup (bp, cp-bp+1), oper, cmdoper_prev, NULL);
+        cmdoper_cur = cmdoper_new (strndup (bp, cp-bp+1), type, cmdoper_prev, NULL);
         if (cmdoper_prev != NULL) { cmdoper_prev->next = cmdoper_cur; }
         if (cmdoper_first == NULL) { cmdoper_first = cmdoper_cur; }
     }
@@ -239,9 +239,9 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
     return cmdoper_first;
 }
 
-void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p c) {
-    for ( ; c != NULL; c = c->next) {
-        c->redir = cmdredir_parser(ctx, c);
-        cmdredir_parse_args (ctx, c->redir);
+void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p o) {
+    for ( ; o != NULL; o = o->next) {
+        o->redir = cmdredir_parser(ctx, o);
+        cmdredir_parse_args (ctx, o->redir);
     }
 }
