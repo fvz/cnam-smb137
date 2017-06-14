@@ -72,10 +72,10 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_IN_EXITING_WF       M_CMDHANDLE" Currently in exiting workflow. Ignoring [%s] command.\n"
 #define M_CMDHANDLE_OK4EXIT             "OK for exiting."
 #define M_CMDHANDLE_OKEXIT              M_CMDHANDLE" "M_CMDHANDLE_OK4EXIT"\n"
-#define M_CMDHANDLE_OKEXIT_OPER_AND     M_CMDHANDLE" Prev Operator=AND and ReturnCode=true. "M_CMDHANDLE_OK4EXIT"\n"
-#define M_CMDHANDLE_OKEXIT_OPER_OR      M_CMDHANDLE" Prev Operator=OR and ReturnCode=false. "M_CMDHANDLE_OK4EXIT"\n"
-#define M_CMDHANDLE_OKEXIT_OPER_SCOLON  M_CMDHANDLE" Prev Operator=SEMICOLON. "M_CMDHANDLE_OK4EXIT"\n"
-#define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command. "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_AND     M_CMDHANDLE" Previous Operator=AND (+ReturnCode=true) : "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_OR      M_CMDHANDLE" Previous Operator=OR (+ReturnCode=false) :"M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_SCOLON  M_CMDHANDLE" Previous Operator=SEMICOLON : "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command : "M_CMDHANDLE_OK4EXIT"\n"
 
 /* builtin messages */
 #define M_BUILTIN                       "[builtin]"
