@@ -4,7 +4,7 @@
 #include "mysh.h"
 
 /* TODO : ability to customize ? (arg cmdline or with rc file) */
-#define MYSH_DEFAULT_PROMPT "Prompt>"
+#define MYSH_DEFAULT_PROMPT "Prompt#"
 
 void mysh_prompt_set(mysh_context_p ctx, char *prompt);
 void mysh_prompt_free(mysh_context_p ctx);
