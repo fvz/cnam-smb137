@@ -70,8 +70,12 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_HANDLING_REDIR      M_CMDHANDLE" Handling redirection [%s]\n"
 #define M_CMDHANDLE_IN_EXITING_WF       M_CMDHANDLE" Currently in exiting workflow. Ignoring [%s] command.\n"
 #define M_CMDHANDLE_FOUND_CMD_EXIT      M_CMDHANDLE" 'exit' command found.\n"
-#define M_CMDHANDLE_AND_OPER_OK_EXIT    M_CMDHANDLE" Prev Operator=AND and ReturnCode=true. OK for exiting.\n"
-#define M_CMDHANDLE_OR_OPER_OK_EXIT     M_CMDHANDLE" Prev Operator=OR and ReturnCode=false. OK for exiting.\n"
+#define M_CMDHANDLE_OK4EXIT             "OK for exiting."
+#define M_CMDHANDLE_OKEXIT              M_CMDHANDLE" "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_AND     M_CMDHANDLE" Prev Operator=AND and ReturnCode=true. "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_OR      M_CMDHANDLE" Prev Operator=OR and ReturnCode=false. "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_OPER_SCOLON  M_CMDHANDLE" Prev Operator=SEMICOLON. "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command. "M_CMDHANDLE_OK4EXIT".\n"
 
 
 #endif /* MYPRINTF_H */

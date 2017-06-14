@@ -47,20 +47,20 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                 ctx_dbmyprintf(1, ctx, M_CMDHANDLE_FOUND_CMD_EXIT);
                 if (o->prev) {
                     if ((o->prev->oper == CMDOPER_AND) && (o->prev->cmdstatus == true)) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_AND_OPER_OK_EXIT);
+                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
                         ctx->status = CTX_STATUS_EXIT;
                     } else if ((o->prev->oper == CMDOPER_OR) && (o->prev->cmdstatus == false)) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OR_OPER_OK_EXIT);
+                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
                         ctx->status = CTX_STATUS_EXIT;
                     } else if (o->prev->oper == CMDOPER_SEMICOLON) {
-                        ctx_dbmyprintf(1, ctx, "[cmdhandle] Prev Operator=SEMICOLON. OK for exiting.\n", r->cmd);
+                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
                         ctx->status = CTX_STATUS_EXIT;
                     } else {
-                        ctx_dbmyprintf(1, ctx, "[cmdhandle] OK for exiting.\n", r->cmd);
+                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT);
                         ctx->status = CTX_STATUS_EXIT;
                     }
                 } else {
-                    ctx_dbmyprintf(1, ctx, "[cmdhandle] No Previous Command. OK for exiting.\n", r->cmd);
+                    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_NO_PREVCMD);
                     ctx->status = CTX_STATUS_EXIT;
                 }
             } else {
