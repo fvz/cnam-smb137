@@ -1,5 +1,5 @@
-#ifndef MYSH_MYSH_H
-#define MYSH_MYSH_H
+#ifndef MYSH_MYSH_H_
+#define MYSH_MYSH_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,4 +47,4 @@
 
 
 
-#endif /* MYSH_MYSH_H */
+#endif /* MYSH_MYSH_H_ */

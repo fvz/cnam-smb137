@@ -1,5 +1,5 @@
-#ifndef MYSH_TYPEDEF_H
-#define MYSH_TYPEDEF_H
+#ifndef MYSH_TYPEDEF_H_
+#define MYSH_TYPEDEF_H_
 
 
 
@@ -107,4 +107,4 @@ struct builtincmd_s {
 
 
 
-#endif /* MYSH_TYPEDEF_H */
+#endif /* MYSH_TYPEDEF_H_ */

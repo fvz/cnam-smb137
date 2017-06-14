@@ -1,5 +1,5 @@
-#ifndef BUILTIN_CMD_H
-#define BUILTIN_CMD_H
+#ifndef BUILTIN_CMD_H_
+#define BUILTIN_CMD_H_
 
 #include "mysh.h"
 
@@ -16,4 +16,4 @@ static const builtincmd_t builtin_list[] =
     { NULL,     NULL },                 /* == end of array == */
 };
 
-#endif /* BUILTIN_CMD_H */
+#endif /* BUILTIN_CMD_H_ */

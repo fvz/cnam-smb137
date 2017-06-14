@@ -1,5 +1,5 @@
-#ifndef CMDREDIR_PARSER_H
-#define CMDREDIR_PARSER_H
+#ifndef CMDREDIR_PARSER_H_
+#define CMDREDIR_PARSER_H_
 
 #include "mysh.h"
 
@@ -11,4 +11,4 @@ void cmdredir_print (mysh_context_p ctx, cmdredir_p c);
 cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str);
 void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p c);
 
-#endif /* CMDREDIR_PARSER_H */
+#endif /* CMDREDIR_PARSER_H_ */

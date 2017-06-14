@@ -1,5 +1,5 @@
-#ifndef CMDOPER_PARSER_H
-#define CMDOPER_PARSER_H
+#ifndef CMDOPER_PARSER_H_
+#define CMDOPER_PARSER_H_
 
 #include "mysh.h"
 
@@ -12,4 +12,4 @@ void cmdoper_print (mysh_context_p ctx, cmdoper_p c);
 cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str);
 void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p c);
 
-#endif /* CMDOPER_PARSER_H */
+#endif /* CMDOPER_PARSER_H_ */

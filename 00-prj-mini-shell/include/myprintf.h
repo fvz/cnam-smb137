@@ -1,5 +1,5 @@
-#ifndef MYPRINTF_H
-#define MYPRINTF_H
+#ifndef MYPRINTF_H_
+#define MYPRINTF_H_
 
 #include "mysh.h"
 
@@ -79,4 +79,4 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command. "M_CMDHANDLE_OK4EXIT".\n"
 
 
-#endif /* MYPRINTF_H */
+#endif /* MYPRINTF_H_ */

@@ -1,5 +1,5 @@
-#ifndef MYSH_HISTORY_H
-#define MYSH_HISTORY_H
+#ifndef MYSH_HISTORY_H_
+#define MYSH_HISTORY_H_
 
 #include "mysh.h"
 
@@ -13,4 +13,4 @@ void mysh_history_add(mysh_context_p ctx, char *cmd);
 void mysh_history_flush(mysh_context_p ctx);
 void mysh_history_free(mysh_context_p ctx);
 
-#endif /* MYSH_HISTORY_H */
+#endif /* MYSH_HISTORY_H_ */

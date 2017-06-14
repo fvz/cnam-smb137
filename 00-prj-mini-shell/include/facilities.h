@@ -1,5 +1,5 @@
-#ifndef MYSH_FACILITIES_H
-#define MYSH_FACILITIES_H
+#ifndef MYSH_FACILITIES_H_
+#define MYSH_FACILITIES_H_
 
 #include "mysh.h"
 
@@ -9,4 +9,4 @@
 void freeif(void* to_free);
 
 
-#endif /* MYSH_FACILITIES_H */
+#endif /* MYSH_FACILITIES_H_ */
