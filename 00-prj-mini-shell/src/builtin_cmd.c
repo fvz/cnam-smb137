@@ -68,8 +68,31 @@ void builtin_cmd_exit (mysh_context_p ctx, cmdredir_p r) {
  *
  * \param ctx Pointeur sur le contexte mysh_context
  * \param r Pointeur sur le CmdRedir en cours
+ *
+ * Cette commande builtin 'echo' affiche sur stdin les paramètres qu'on
+ * lui passe en paramètre. Si le 1er paramètre est '-n', aucune ligne n'est
+ * sautée en fin d'affichage.
  */
 void builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r) {
 
-    /* TODO */
+    /* TODO :   for better perf, we can build the string in a buffer
+                and print on the stdin by using 'printf' only one time */
+    if (r) {
+        int line_feed = true;
+        int i;
+        /* start at 1 because '0' arg is the 'echo' command. */
+        for (i=1; r->args[i] != NULL; i++) {
+
+            if ((i == 1) && (strcmp (r->args[i], "-n") == 0)) {
+                line_feed = false;
+                continue;
+            }
+            printf("%s", r->args[i]);
+            if (r->args[i+1] != NULL) { printf(" "); }
+        }
+
+        if (line_feed) {
+            printf("\n");
+        }
+    }
 }
