@@ -82,6 +82,8 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
         }
     }
 
+    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_END_ENGINE);
+
     //cmdoper_print(mycmdoper);
     cmdoper_free(mycmdoper);
 }

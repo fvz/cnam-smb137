@@ -48,8 +48,7 @@ void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
         } else {
 
             if (!r->args[1] || (r->args[1][0] == '\0')) {
-                /* simple 'cd' command is like 'cd ~' */
-                /* TODO */
+                /* TODO : simple 'cd' command is like 'cd ~' */
             } else {
                 int result;
                 ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_CD_ATTEMPTING, r->args[1]);
@@ -66,7 +65,7 @@ void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
             }
         }
     } else {
-        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR);
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "cd");
     }
 }
 
@@ -79,8 +78,17 @@ void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
  */
 void builtin_cmd_pwd (mysh_context_p ctx, cmdredir_p r) {
 
-    /* TODO */
-
+    if (r) {
+        char buff[BUFFER_SIZE];
+        if (getcwd(buff, BUFFER_SIZE) != NULL) {
+            printf("%s\n", buff);
+        } else {
+            ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_PWD_ERR);
+            ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_PWD_ERR_DETAILS, errno, strerror(errno));
+        }
+    } else {
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "pwd");
+    }
 }
 
 /**
@@ -92,24 +100,28 @@ void builtin_cmd_pwd (mysh_context_p ctx, cmdredir_p r) {
  */
 void builtin_cmd_exit (mysh_context_p ctx, cmdredir_p r) {
 
-    cmdoper_p oprev;
-    if (r && r->oper && ((oprev = r->oper->prev) != NULL)) {
-        if ((oprev->type == CMDOPER_AND) && (oprev->cmdstatus == true)) {
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
-            ctx->status = CTX_STATUS_EXIT;
-        } else if ((oprev->type == CMDOPER_OR) && (oprev->cmdstatus == false)) {
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
-            ctx->status = CTX_STATUS_EXIT;
-        } else if (oprev->type == CMDOPER_SEMICOLON) {
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
-            ctx->status = CTX_STATUS_EXIT;
+    if (r) {
+        cmdoper_p oprev;
+        if (r->oper && ((oprev = r->oper->prev) != NULL)) {
+            if ((oprev->type == CMDOPER_AND) && (oprev->cmdstatus == true)) {
+                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
+                ctx->status = CTX_STATUS_EXIT;
+            } else if ((oprev->type == CMDOPER_OR) && (oprev->cmdstatus == false)) {
+                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
+                ctx->status = CTX_STATUS_EXIT;
+            } else if (oprev->type == CMDOPER_SEMICOLON) {
+                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
+                ctx->status = CTX_STATUS_EXIT;
+            } else {
+                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT);
+                ctx->status = CTX_STATUS_EXIT;
+            }
         } else {
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT);
+            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_NO_PREVCMD);
             ctx->status = CTX_STATUS_EXIT;
         }
     } else {
-        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_NO_PREVCMD);
-        ctx->status = CTX_STATUS_EXIT;
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "exit");
     }
 }
 
@@ -145,5 +157,7 @@ void builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r) {
         if (line_feed) {
             printf("\n");
         }
+    } else {
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "echo");
     }
 }

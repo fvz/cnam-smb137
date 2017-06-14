@@ -67,6 +67,7 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE                     "[cmdhandle]"
 #define M_CMDHANDLE_START_PARSER        M_CMDHANDLE" === Starting the parser engine ============\n"
 #define M_CMDHANDLE_START_ENGINE        M_CMDHANDLE" === Starting the handling engine ============\n"
+#define M_CMDHANDLE_END_ENGINE          M_CMDHANDLE" === Ending the handling engine ============\n"
 #define M_CMDHANDLE_HANDLING_CMD        M_CMDHANDLE" Handling command [%s]\n"
 #define M_CMDHANDLE_HANDLING_REDIR      M_CMDHANDLE" Handling redirection [%s]\n"
 #define M_CMDHANDLE_IN_EXITING_WF       M_CMDHANDLE" Currently in exiting workflow. Ignoring [%s] command.\n"
@@ -80,6 +81,7 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 /* builtin messages */
 #define M_BUILTIN                       "[builtin]"
 #define M_BUILTIN_PROCESS_BUILTIN_CMD   M_BUILTIN" Processing Built-in [%s] command\n"
+#define M_BUILTIN_CMD_UNKNOWN_ERR       M_BUILTIN" Built-in [%s] command : unknown error.\n"
 #define M_BUILTIN_CMD_CD_UNKNOWN_ERR    M_BUILTIN" Built-in 'cd' command : unknown error.\n"
 #define M_BUILTIN_CMD_CD_UNKNOWN_ERR_ARGS0_EMPTY \
                                         M_BUILTIN" Built-in 'cd' command : unknown error (arg[0] empty).\n"
@@ -87,6 +89,8 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_BUILTIN_CMD_CD_OK_CHANGED     M_BUILTIN" Current directory is now [%s]\n"
 #define M_BUILTIN_CMD_CD_ERR            M_BUILTIN" Error in changing directory.\n"
 #define M_BUILTIN_CMD_CD_ERR_DETAILS    M_BUILTIN" Error in changing directory (result=[%d]).\n"
+#define M_BUILTIN_CMD_PWD_ERR           M_BUILTIN" Error in retrieving current directory.\n"
+#define M_BUILTIN_CMD_PWD_ERR_DETAILS   M_BUILTIN" Error in retrieving current directory [errno#%d='%s'].\n"
 
 
 #endif /* MYPRINTF_H_ */
