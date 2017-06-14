@@ -22,6 +22,7 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
     cmdoper_p mycmdoper;
     mysh_history_add(ctx, cmdline);
 
+    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_START_PARSER);
     mycmdoper = cmdoper_parser (ctx, cmdline);
     cmdoper_parse_redir (ctx, mycmdoper);
 

@@ -65,7 +65,8 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 
 /* cmdhandle messages */
 #define M_CMDHANDLE                     "[cmdhandle]"
-#define M_CMDHANDLE_START_ENGINE        M_CMDHANDLE" === Starting the handling engine ===\n"
+#define M_CMDHANDLE_START_PARSER        M_CMDHANDLE" === Starting the parser engine ============\n"
+#define M_CMDHANDLE_START_ENGINE        M_CMDHANDLE" === Starting the handling engine ============\n"
 #define M_CMDHANDLE_HANDLING_CMD        M_CMDHANDLE" Handling command [%s]\n"
 #define M_CMDHANDLE_HANDLING_REDIR      M_CMDHANDLE" Handling redirection [%s]\n"
 #define M_CMDHANDLE_IN_EXITING_WF       M_CMDHANDLE" Currently in exiting workflow. Ignoring [%s] command.\n"
