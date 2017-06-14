@@ -60,8 +60,8 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
     char *bp, *cp, *ep;
     bp = ep = str;
 
-    ctx_myprintf(1, ctx, "[cmdargs_parser] Parse args of cmdline [%s]\n", str);
-    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] Parse args of cmdline [%s]\n", str);
+    ctx_myprintf(1, ctx, M_CMDARGS_PARSER_PARSE_ARGS, str);
+    ctx_dbmyprintf(1, ctx, M_CMDARGS_PARSER_PARSE_ARGS, str);
 
     buff = (char*) malloc (strlen(str) * sizeof(char));
     ibuff = 0;
@@ -69,10 +69,10 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
     ielt = 0; nelt = 1;
     (*array) = (char**) malloc (nelt * sizeof(char*));
 
-    ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Cursor string is on [%s]\n", bp);
+    ctx_dbmyprintf(3, ctx, M_CMDARGS_PARSER_CURSOR_IS, bp);
     for(cp=bp; *cp != '\0'; cp++) {
 
-        ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Analyzing character [%c]\n", *cp);
+        ctx_dbmyprintf(3, ctx, M_CMDARGS_PARSER_ANALYZE_CHAR, *cp);
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "Escaping car\n", "");
@@ -155,11 +155,11 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
                 (*array)[ielt] = strndup (buff, ibuff);
                 ibuff = 0;
 
-                ctx_dbmyprintf(2, ctx, "[cmdargs_parser] Found new #%d argument [%s]\n", ielt+1, (*array)[ielt]);
+                ctx_dbmyprintf(2, ctx, M_CMDARGS_PARSER_FOUND_ARG, ielt+1, (*array)[ielt]);
                 ielt++;
 
                 bp = cp+1;
-                ctx_dbmyprintf(3, ctx, "[cmdargs_parser] Cursor string is on [%s]\n", bp);
+                ctx_dbmyprintf(3, ctx, M_CMDARGS_PARSER_CURSOR_IS, bp);
             }
             b_start = b_end = false;
             b_singleq = b_doubleq = false;
@@ -172,13 +172,13 @@ int cmdargs_parser (mysh_context_p ctx, char *str, char ***array) {
         buff[ibuff++] = '\0';
         (*array)[ielt] = strndup (buff, ibuff);
         ibuff = 0;
-        ctx_dbmyprintf(2, ctx, "[cmdargs_parser] Found new #%d argument [%s]\n", ielt+1, (*array)[ielt]);
+        ctx_dbmyprintf(2, ctx, M_CMDARGS_PARSER_FOUND_ARG, ielt+1, (*array)[ielt]);
         ielt++;
     }
 
     free(buff);
 
     (*array)[ielt] = NULL;
-    ctx_dbmyprintf(1, ctx, "[cmdargs_parser] End of parser. This cmd [%s] give %d arguments.\n", str, ielt);
+    ctx_dbmyprintf(1, ctx, M_CMDARGS_PARSER_END_GIVE_ARG, str, ielt);
     return ielt;
 }

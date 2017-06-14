@@ -100,10 +100,8 @@ void cmdoper_print_one (mysh_context_p ctx, cmdoper_p c) {
         oper = strdup("");
     }
 
-    ctx_dbmyprintf(1, ctx, "[cmdoper] cmd[%s] operator[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
-        c->cmd, oper, c->prev, c, c->next);
-    ctx_myprintf(1, ctx, "[cmdoper] cmd[%s] operator[%s]\n",
-        c->cmd, oper);
+    ctx_dbmyprintf(1, ctx, M_CMDOPER_PARSER_PRINT_PTR, c->cmd, oper, c->prev, c, c->next);
+    ctx_myprintf(1, ctx, M_CMDOPER_PARSER_PRINT, c->cmd, oper);
 
     cmdredir_print (ctx, c->redir);
 
@@ -115,7 +113,6 @@ void cmdoper_print (mysh_context_p ctx, cmdoper_p c) {
         cmdoper_print_one (ctx, c);
     }
 }
-
 
 cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
@@ -135,16 +132,16 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
     if (str == NULL || *str == '\0') { return NULL; }
 
-    ctx_myprintf(1, ctx, "[cmdoper_parser] Parse cmdline [%s]\n", str);
-    ctx_dbmyprintf(1, ctx, "[cmdoper_parser] Parse cmdline [%s]\n", str);
+    ctx_myprintf(1, ctx, M_CMDOPER_PARSER_PARSE_CMDLINE, str);
+    ctx_dbmyprintf(1, ctx, M_CMDOPER_PARSER_PARSE_CMDLINE, str);
 
     bp = ep = str;
     cmdoper_cur = cmdoper_prev = cmdoper_first = NULL;
 
-    ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Cursor string is on [%s]\n", bp);
+    ctx_dbmyprintf(3, ctx, M_CMDOPER_PARSER_CURSOR_IS, bp);
     for(cp=bp; *cp != '\0'; cp++) {
 
-        ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Analyzing character [%c]\n", *cp);
+        ctx_dbmyprintf(3, ctx, M_CMDOPER_PARSER_ANALYZE_CHAR, *cp);
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Escaping car\n", "");
@@ -224,7 +221,7 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
                 if (cmdoper_prev != NULL) { cmdoper_prev->next = cmdoper_cur; }
                 if (cmdoper_first == NULL) { cmdoper_first = cmdoper_cur; }
                 bp = cp+1;
-                ctx_dbmyprintf(3, ctx, "[cmdoper_parser] Cursor string is on [%s]\n", bp);
+                ctx_dbmyprintf(3, ctx, M_CMDOPER_PARSER_CURSOR_IS, bp);
             }
             oper = CMDOPER_EMPTY;
             b_cmdstart = b_cmdend = false;

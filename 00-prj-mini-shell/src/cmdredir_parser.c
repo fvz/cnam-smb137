@@ -49,10 +49,8 @@ void cmdredir_print (mysh_context_p ctx, cmdredir_p c) {
             redir = strdup("");
         }
 
-        ctx_dbmyprintf(1, ctx, "[cmdredir] cmd[%s] redirector[%s] / pointers : prev=[%p] cur=[%p] next[%p]\n",
-            c->cmd, redir, c->prev, c, c->next);
-        ctx_myprintf(1, ctx, "[cmdredir] cmd[%s] redirector[%s]\n",
-            c->cmd, redir);
+        ctx_dbmyprintf(1, ctx, M_CMDREDIR_PARSER_PRINT_PTR, c->cmd, redir, c->prev, c, c->next);
+        ctx_myprintf(1, ctx, M_CMDREDIR_PARSER_PRINT, c->cmd, redir);
 
         freeif(redir);
         c = c->next;
@@ -83,7 +81,7 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, char *str) {
 
     for(cp=bp; *cp != '\0'; cp++) {
 
-        ctx_dbmyprintf(2, ctx, "[cmdredir_parse] Analyzing character [%c]\n", *cp);
+        ctx_dbmyprintf(2, ctx, M_CMDREDIR_ANALYZE_CHAR, *cp);
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "Escaping car\n", "");

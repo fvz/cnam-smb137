@@ -42,6 +42,7 @@
 #include "mysh_prompt.h"
 #include "cmdhandle.h"
 #include "cmdargs_parser.h"
+#include "myprintf.h"
 
 
 
