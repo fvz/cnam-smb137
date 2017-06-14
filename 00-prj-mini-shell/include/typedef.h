@@ -89,4 +89,22 @@ struct cmdoper_s {
 
 
 
+
+
+typedef struct builtincmd_s builtincmd_t;
+typedef builtincmd_t* builtincmd_p;
+struct builtincmd_s {
+    /* command name */
+    char *cmd;
+
+    /* callback to call if this command is found */
+    void (*cb)(mysh_context_p ctx, cmdoper_p oper);
+};
+
+
+
+
+
+
+
 #endif /* MYSH_TYPEDEF_H */

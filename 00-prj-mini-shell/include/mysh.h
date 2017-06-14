@@ -43,6 +43,7 @@
 #include "cmdhandle.h"
 #include "cmdargs_parser.h"
 #include "myprintf.h"
+#include "builtin_cmd.h"
 
 
 

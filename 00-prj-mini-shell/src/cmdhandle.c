@@ -7,6 +7,7 @@
 
 #include "cmdhandle.h"
 
+
 /**
  * \fn void cmdline_handle (mysh_context_p ctx, char *cmdline)
  * \brief Traite une cmdline.
@@ -43,28 +44,17 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                 continue;
             }
 
-            if (strcmp(a, "exit") == 0) {
-                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_FOUND_CMD_EXIT);
-                if (o->prev) {
-                    if ((o->prev->oper == CMDOPER_AND) && (o->prev->cmdstatus == true)) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
-                        ctx->status = CTX_STATUS_EXIT;
-                    } else if ((o->prev->oper == CMDOPER_OR) && (o->prev->cmdstatus == false)) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
-                        ctx->status = CTX_STATUS_EXIT;
-                    } else if (o->prev->oper == CMDOPER_SEMICOLON) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
-                        ctx->status = CTX_STATUS_EXIT;
-                    } else {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT);
-                        ctx->status = CTX_STATUS_EXIT;
-                    }
-                } else {
-                    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_NO_PREVCMD);
-                    ctx->status = CTX_STATUS_EXIT;
+            int i;
+            int builtin_found = false;
+            for(i=0; builtin_list[i].cb != NULL; i++) {
+                if (strcmp(a, builtin_list[i].cmd) == 0) {
+                    builtin_list[i].cb(ctx, o);
+                    builtin_found = true;
+                    break;
                 }
-            } else {
+            }
 
+            if (!builtin_found) {
                 printf("===CHILD / FORK ===\n");
                 if (r->prev == NULL) {
                     int status = 0;
@@ -77,11 +67,8 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                     } else {
                         waitpid(child, &status, 0);
                     }
-
                 }
             }
-
-
 
 /*
             switch(r->redir) {
@@ -101,9 +88,6 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                     break;
             }
 */
-
-
-
 
         }
     }
