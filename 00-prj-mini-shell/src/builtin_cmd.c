@@ -41,8 +41,32 @@ int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r) {
  */
 void builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
 
-    /* TODO */
+    if (r) {
+        if ( ! r->args[0]) {
+            ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR);
+            ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR_ARGS0_EMPTY);
+        } else {
 
+            if (!r->args[1] || (r->args[1][0] == '\0')) {
+                /* simple 'cd' command is like 'cd ~' */
+                /* TODO */
+            } else {
+                int result;
+                ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_CD_ATTEMPTING, r->args[1]);
+                if ((result = chdir(r->args[1])) == 0) {
+                    ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, r->args[1]);
+                    /* we have changed of directory :
+                    we can set the new directory in the shell prompt */
+                    mysh_prompt_set(ctx, r->args[1]);
+                } else {
+                    ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_ERR);
+                    ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_ERR_DETAILS, result);
+                }
+            }
+        }
+    } else {
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR);
+    }
 }
 
 /**

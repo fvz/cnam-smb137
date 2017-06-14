@@ -80,6 +80,13 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 /* builtin messages */
 #define M_BUILTIN                       "[builtin]"
 #define M_BUILTIN_PROCESS_BUILTIN_CMD   M_BUILTIN" Processing Built-in [%s] command\n"
+#define M_BUILTIN_CMD_CD_UNKNOWN_ERR    M_BUILTIN" Built-in 'cd' command : unknown error.\n"
+#define M_BUILTIN_CMD_CD_UNKNOWN_ERR_ARGS0_EMPTY \
+                                        M_BUILTIN" Built-in 'cd' command : unknown error (arg[0] empty).\n"
+#define M_BUILTIN_CMD_CD_ATTEMPTING     M_BUILTIN" Attempting to change directory to [%s]\n"
+#define M_BUILTIN_CMD_CD_OK_CHANGED     M_BUILTIN" Current directory is now [%s]\n"
+#define M_BUILTIN_CMD_CD_ERR            M_BUILTIN" Error in changing directory.\n"
+#define M_BUILTIN_CMD_CD_ERR_DETAILS    M_BUILTIN" Error in changing directory (result=[%d]).\n"
 
 
 #endif /* MYPRINTF_H_ */
