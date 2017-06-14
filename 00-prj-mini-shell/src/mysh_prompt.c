@@ -7,14 +7,39 @@
 
 #include "mysh_prompt.h"
 
-/* TODO : ability to customize ? (arg cmdline or with rc file) */
-#define MYSH_DEFAULT_PROMPT "Prompt>"
+
+/**
+ * \fn void mysh_prompt_set(mysh_context_p ctx, char *prompt)
+ * \brief Redéfinition du prompt à afficher (il est stocké dans le contexte)
+ *
+ * \param ctx Pointeur sur l'objet mysh_context
+ * \param prompt Nouveau prompt à afficher
+ */
+void mysh_prompt_set(mysh_context_p ctx, char *prompt) {
+	if (ctx != NULL) {
+		freeif(ctx->prompt);
+		ctx->prompt = prompt ? strndup(prompt, strlen(prompt)) : NULL;
+	}
+}
+
+/**
+ * \fn void mysh_prompt_free(mysh_context_p ctx)
+ * \brief Libération du prompt
+ *
+ * \param ctx Pointeur sur l'objet mysh_context
+ */
+void mysh_prompt_free(mysh_context_p ctx) {
+	if (ctx != NULL) {
+		freeif(ctx->prompt);
+		ctx->prompt = NULL;
+	}
+}
 
 /**
  * \fn void mysh_prompt_print(mysh_context_p ctx)
- * \brief Affichage de linvite prompt.
+ * \brief Affichage de l'invite prompt.
  *
- * \param h Pointeur sur l'objet mysh_context
+ * \param ctx Pointeur sur l'objet mysh_context
  */
 void mysh_prompt_print(mysh_context_p ctx) {
 	printf("%s ", MYSH_DEFAULT_PROMPT);
@@ -24,7 +49,7 @@ void mysh_prompt_print(mysh_context_p ctx) {
  * \fn int mysh_prompt_catch(mysh_context_p ctx)
  * \brief Essaye de récupérer une ligne de commande passée dans mysh.
  *
- * \param h Pointeur sur l'objet mysh_context
+ * \param ctx Pointeur sur l'objet mysh_context
  * \return bool true/false suivant si une ligne de cmd a été récupérée.
  */
 int mysh_prompt_catch(mysh_context_p ctx) {

@@ -19,6 +19,8 @@ typedef struct mysh_context_s mysh_context_t;
 typedef mysh_context_t* mysh_context_p;
 struct mysh_context_s {
 
+    char *prompt;
+
     int argc; char **argv;
 
     char *cmd;

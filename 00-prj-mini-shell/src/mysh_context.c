@@ -26,6 +26,8 @@ const char* binary_optstr = "c:dvh";
 
 void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
 
+    mysh_prompt_set(ctx, MYSH_DEFAULT_PROMPT);
+
     ctx->argc = argc;
     ctx->argv = argv;
 
@@ -73,8 +75,8 @@ mysh_context_p mysh_context_new (int argc, char** argv) {
 
 void mysh_context_free (mysh_context_p ctx) {
     if (ctx != NULL) {
-        if (ctx->cmd != NULL)
-            free(ctx->cmd);
+        mysh_prompt_free(ctx);
+        freeif(ctx->cmd);
         mysh_history_free(ctx);
         free(ctx);
     }
