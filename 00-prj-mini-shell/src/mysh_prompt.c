@@ -42,7 +42,7 @@ void mysh_prompt_free(mysh_context_p ctx) {
  * \param ctx Pointeur sur l'objet mysh_context
  */
 void mysh_prompt_print(mysh_context_p ctx) {
-	printf("%s ", MYSH_DEFAULT_PROMPT);
+	printf("%s ", ctx->prompt);
 }
 
 /**
