@@ -3,6 +3,7 @@
 
 #include "mysh.h"
 
+void cmdalias_list_init(mysh_context_p ctx);
 cmdalias_p cmdalias_new(char *name, char *cmd);
 void cmdalias_free(cmdalias_p alias);
 void cmdalias_free_array_elt(cmdalias_p *alias);
@@ -17,5 +18,13 @@ int cmdalias_parse_cmd(mysh_context_p ctx, char *cmd, char **newalias, char **ne
 void cmdalias_print_one(cmdalias_p alias);
 void cmdalias_print(mysh_context_p ctx);
 void cmdalias_check_alias(mysh_context_p ctx, cmdredir_p r);
+
+static const cmdalias_t aliases_default_list[] =
+{
+    { "ll",     "ls -l" },
+    { "la",     "ls -la" },
+
+    { NULL,     NULL},          /* == end of array == */
+};
 
 #endif /* CMDALIAS_H_ */

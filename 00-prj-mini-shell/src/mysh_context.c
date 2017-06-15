@@ -44,6 +44,8 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
 
     ctx->alias = NULL;
     ctx->nalias = 0;
+
+    cmdalias_list_init(ctx);
 }
 
 mysh_context_p mysh_context_new (int argc, char** argv) {

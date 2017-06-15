@@ -8,6 +8,22 @@
 #include "cmdalias.h"
 
 /**
+ * \fn void cmdalias_list_init(mysh_context_p ctx)
+ * \brief Initialise la liste d'alias avec la liste par défaut
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ */
+void cmdalias_list_init(mysh_context_p ctx) {
+    int i;
+    for(i=0; aliases_default_list[i].name != NULL; i++) {
+        cmdalias_add( ctx,
+            aliases_default_list[i].name,
+            aliases_default_list[i].cmd
+        );
+    }
+}
+
+/**
  * \fn cmdalias_p cmdalias_new(char *name, char *cmd)
  * \brief Constructeur d'objet cmdalias_p
  *
