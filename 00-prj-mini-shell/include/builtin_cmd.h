@@ -10,6 +10,7 @@ int builtin_cmd_pwd (mysh_context_p ctx, cmdredir_p r);
 int builtin_cmd_exit (mysh_context_p ctx, cmdredir_p r);
 int builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r);
 
+int builtin_cmd_alias (mysh_context_p ctx, cmdredir_p r);
 
 static const builtincmd_t builtin_list[] =
 {
@@ -17,6 +18,8 @@ static const builtincmd_t builtin_list[] =
     { "pwd",    builtin_cmd_pwd },      /* 'pwd' command */
     { "exit",   builtin_cmd_exit },     /* 'exit' command */
     { "echo",   builtin_cmd_echo },     /* 'echo' command */
+
+    { "alias",  builtin_cmd_alias },    /* 'alias' command */
 
     { NULL,     NULL },                 /* == end of array == */
 };

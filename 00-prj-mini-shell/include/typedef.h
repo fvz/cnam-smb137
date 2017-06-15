@@ -3,10 +3,31 @@
 
 
 
-/* history
- */
+/* typedef */
+
 typedef struct mysh_history_s mysh_history_t;
 typedef mysh_history_t* mysh_history_p;
+
+typedef struct mysh_context_s mysh_context_t;
+typedef mysh_context_t* mysh_context_p;
+
+typedef struct cmdredir_s cmdredir_t;
+typedef cmdredir_t* cmdredir_p;
+
+typedef struct cmdoper_s cmdoper_t;
+typedef cmdoper_t* cmdoper_p;
+
+typedef struct builtincmd_s builtincmd_t;
+typedef builtincmd_t* builtincmd_p;
+
+typedef struct cmdalias_s cmdalias_t;
+typedef cmdalias_t* cmdalias_p;
+
+
+
+
+/* history
+ */
 struct mysh_history_s {
     int temp_fd;
     char *temp_path;
@@ -15,8 +36,6 @@ struct mysh_history_s {
 
 /* context
 */
-typedef struct mysh_context_s mysh_context_t;
-typedef mysh_context_t* mysh_context_p;
 struct mysh_context_s {
 
     char *prompt;
@@ -34,20 +53,14 @@ struct mysh_context_s {
     int exitstatus;
 
     char *previous_dir;
+
+    cmdalias_p *alias;
 };
 
 /* context status */
 #define CTX_STATUS_EXIT     0x00    /* program in exiting stage */
 #define CTX_STATUS_LOOP     0x01    /* program in looping stage */
 
-
-/* cmdredir types */
-typedef struct cmdredir_s cmdredir_t;
-typedef cmdredir_t* cmdredir_p;
-
-/* cmdoper types */
-typedef struct cmdoper_s cmdoper_t;
-typedef cmdoper_t* cmdoper_p;
 
 
 /* cmdredir : a command redirection (string of command associated to a redirection operator like '>', '>>', '<', '<<')
@@ -104,8 +117,6 @@ struct cmdoper_s {
 
 
 
-typedef struct builtincmd_s builtincmd_t;
-typedef builtincmd_t* builtincmd_p;
 struct builtincmd_s {
     char *cmd; /* command name */
     int (*cb)(mysh_context_p ctx, cmdredir_p r); /* callback to call if this command is found */
@@ -113,6 +124,12 @@ struct builtincmd_s {
 
 
 
+
+
+struct cmdalias_s {
+    char *alias;    /* alias name */
+    char *cmd;      /* and it's commande */
+};
 
 
 

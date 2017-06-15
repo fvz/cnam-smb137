@@ -41,6 +41,8 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
     ctx->exitstatus = EXIT_SUCCESS;
 
     ctx->previous_dir = NULL;
+
+    ctx->alias = NULL;
 }
 
 mysh_context_p mysh_context_new (int argc, char** argv) {

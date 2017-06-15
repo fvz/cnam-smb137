@@ -43,7 +43,7 @@
 #include "myprintf.h"
 #include "builtin_cmd.h"
 #include "cmdfork.h"
-
+#include "cmdalias.h"
 
 
 #endif /* MYSH_MYSH_H_ */

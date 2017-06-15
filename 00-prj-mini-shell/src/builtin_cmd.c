@@ -209,3 +209,17 @@ int builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r) {
 
     return EXIT_SUCCESS;
 }
+
+/**
+ * \fn int builtin_cmd_alias (mysh_context_p ctx, cmdoper_p oper)
+ * \brief Commande Built-in "alias" : elle (re)définit un alias ou affiche leur liste
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+int builtin_cmd_alias (mysh_context_p ctx, cmdredir_p r) {
+
+    /* TODO */
+
+    return EXIT_SUCCESS;
+}
