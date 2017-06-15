@@ -1,0 +1,16 @@
+
+ o errno + print
+
+ o alias
+    - Ability to set an alias to empty : it remove it
+
+ o Parsers (cmdoper, cmdredir, cmdargs)
+    - do no store the '\' char : use a temporary buffer
+
+ o builtin_cmd
+    - builtin_cmd_echo : rewrite with only one printf.
+        For better perf, we can build the string in a buffer and print
+        on the stdin by using 'printf' only one time.
+
+    - 'history' built-in command
+

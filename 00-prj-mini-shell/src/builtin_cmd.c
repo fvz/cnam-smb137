@@ -88,7 +88,6 @@ int builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
         }
 
         if ((result = chdir(to_dir)) != 0) {
-            /* TODO : errno + details */
             ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_ERR);
             ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_ERR_DETAILS, result);
             return EXIT_FAILURE;
@@ -185,8 +184,6 @@ int builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r) {
     int line_feed = true;
     int i;
 
-    /* TODO :   for better perf, we can build the string in a buffer
-                and print on the stdin by using 'printf' only one time */
     if (!r) {
         ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "echo");
         return EXIT_FAILURE;

@@ -144,7 +144,6 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "[cmdoper_parser] Escaping car\n", "");
-            /* TODO  do no store the '\' char : use a temporary buffer */
             b_escape = true;
             continue;
         }

@@ -190,8 +190,6 @@ void cmdalias_add(mysh_context_p ctx, char *name, char *cmd) {
  */
 int cmdalias_parse_cmd(mysh_context_p ctx, char *cmd, char **newalias, char **newcmd) {
 
-    /* TODO : Ability to set an alias to empty : it remove it */
-
     char *bp, *cp, *ep;
     int in_alias = false;
     int in_cmd = false;

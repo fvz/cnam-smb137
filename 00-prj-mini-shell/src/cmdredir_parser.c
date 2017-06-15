@@ -87,7 +87,6 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, cmdoper_p oper) {
 
         if (*cp == '\\') {
             ctx_dbmyprintf(2, ctx, "Escaping car\n", "");
-            /* TODO  do no store the '\' char : use a temporary buffer */
             b_escape = true;
             continue;
         }
