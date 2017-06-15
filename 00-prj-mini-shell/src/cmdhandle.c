@@ -33,6 +33,11 @@ void cmdline_handle2 (mysh_context_p ctx, char *cmdline) {
         cmdoper_print_one (ctx, o);
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_HANDLING_CMD, o->cmd);
 
+        if (ctx->status == CTX_STATUS_EXIT) {
+            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_IN_EXITING_WF, o->cmd);
+            continue;
+        }
+
         if (o->prev && (
             (o->prev->exitstatus == EXIT_FAILURE && o->prev->type == CMDOPER_AND) ||
             (o->prev->exitstatus == EXIT_SUCCESS && o->prev->type == CMDOPER_OR)
@@ -49,80 +54,83 @@ void cmdline_handle2 (mysh_context_p ctx, char *cmdline) {
                 o->cmd);
             continue;
         }
+        /* for(r=o->redir; r != NULL; r=r->next)  // if we want to loop in all redir */
 
-        int redir_loop_last = false;
-
-        /* for all cmdredir of each cmdoper */
-        for(r=o->redir; !redir_loop_last && r != NULL; r=r->next) {
-
-            ctx_dbmyprintf(1, ctx, M_CMDHANDLE_HANDLING_REDIR, r->args[0]);
-            cmdalias_check_alias(ctx, r);
-
-            if (ctx->status == CTX_STATUS_EXIT) {
-                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_IN_EXITING_WF, o->cmd);
-                redir_loop_last = true;
-                continue;
-            }
+        /* hypothèse : focalisation sur les 2 premiers cmdredir du cmdoper courant */
+        r = o->redir;
 
 
-#if 1
-            int fd, fd_stdout;
+        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_HANDLING_REDIR, r->args[0]);
+        cmdalias_check_alias(ctx, r);
 
-            switch(r->redir) {
-                case CMDREDIR_EMPTY:
-                    break;
-                case CMDREDIR_PIPE:
-                    break;
-                case CMDREDIR_TRUNCAT:
-                    if (r->next && r->next->args) {
+        switch(r->redir) {
+            case CMDREDIR_EMPTY:
+                cmdfork_exec(ctx, r);
+                break;
 
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
-                        fd = open(r->next->args[0], O_TRUNC | O_WRONLY);
+            case CMDREDIR_PIPE:
+                cmdfork_pipe4(ctx, r);
+                break;
 
-                        fd_stdout = dup(fileno(stdout));
-                        dup2(fd, fileno(stdout));
-                        close(fd);
-                    }
-                    redir_loop_last = true;
-                    break;
-                case CMDREDIR_APPEND:
-                    if (r->next && r->next->args) {
-                        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
-                        fd = open(r->next->args[0], O_RDWR|O_APPEND|O_CREAT, 00744);
-                        dup2(fd, fileno(stdout));
-                        close(fd);
-                    }
-                    redir_loop_last = true;
-                    break;
+            case CMDREDIR_TRUNCAT:
+                cmdfork_truncat(ctx, r);
+                break;
 
-                case CMDREDIR_INPUT:
-                    break;
-                case CMDREDIR_DINPUT:
-                    break;
-                default:
-                    break;
-            }
+            case CMDREDIR_APPEND:
+                cmdfork_append(ctx, r);
+                break;
+
+            case CMDREDIR_INPUT:
+                break;
+            case CMDREDIR_DINPUT:
+                break;
+            default:
+                break;
+        }
+
+#if 0
+        if (builtin_loop_scan (ctx, r)) {
+            /* a builtin cmd has been found and executed. */
+            continue;
+        }
+
+        /* we process a fork if cmd isn't a built-in cmd */
+        cmdfork_do(ctx, r);
+
+
+        switch(r->redir) {
+            case CMDREDIR_EMPTY:
+                break;
+            case CMDREDIR_PIPE:
+                break;
+            case CMDREDIR_TRUNCAT:
+                if (r->next && r->next->args) {
+                    dup2(fd_stdout,fileno(stdout));
+                }
+                break;
+            case CMDREDIR_APPEND:
+                if (r->next && r->next->args) {
+                    dup2(fd_stdout,fileno(stdout));
+                }
+                break;
+
+            case CMDREDIR_INPUT:
+                break;
+            case CMDREDIR_DINPUT:
+                break;
+            default:
+                break;
+        }
+
 #endif
 
 
-            if (builtin_loop_scan (ctx, r)) {
-                /* a builtin cmd has been found and executed. */
-                redir_loop_last = true;
-                continue;
-            }
-
-            /* we process a fork if cmd isn't a built-in cmd */
-            cmdfork_do(ctx, r);
-
-            //dup2(fd_stdout,fileno(stdout));
-            //close(fd_stdout);
-        }
+        //dup2(fd_stdout,fileno(stdout));
+        //close(fd_stdout);
     }
 
-    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_END_ENGINE);
-
-    //cmdoper_print(mycmdoper);
     cmdoper_free(mycmdoper);
+    ctx_dbmyprintf(1, ctx, M_CMDHANDLE_END_ENGINE);
 }
 
 
