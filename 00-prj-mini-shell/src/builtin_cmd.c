@@ -8,7 +8,7 @@
 #include "builtin_cmd.h"
 
 /**
- * \fn int builtin_loop (mysh_context_p ctx, cmdoper_p o)
+ * \fn int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r)
  * \brief Cherche si cmd présente parmi les builtin et exécute la fonction le cas échéant.
  *
  * \param ctx Pointeur sur le contexte mysh_context

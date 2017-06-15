@@ -1,3 +1,10 @@
+/**
+ * \file typedef.h
+ * \brief l'ensemble des définitions de types
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYSH_TYPEDEF_H_
 #define MYSH_TYPEDEF_H_
 

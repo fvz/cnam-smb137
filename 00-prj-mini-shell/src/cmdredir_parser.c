@@ -1,7 +1,23 @@
-#include "typedef.h"
+/**
+ * \file cmdredir_parser.c
+ * \brief Parser de 'cmdredir'
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #include "cmdredir_parser.h"
 
-
+/**
+ * \fn cmdredir_p cmdredir_new (cmdoper_p oper, char *cmd, int redir, cmdredir_p prev, cmdredir_p next)
+ * \brief Constructeur d'objet cmdredir
+ *
+ * \param oper cmdoper parent
+ * \param cmd Commande correspondante
+ * \param redir Type de redirection
+ * \param prev Element cmdredir précédent (dans la liste chaînée)
+ * \param next Element cmdredir suivant (dans la liste chaînée)
+ * \return nouvel élément cmdoper alloué
+ */
 cmdredir_p cmdredir_new (cmdoper_p oper, char *cmd, int redir, cmdredir_p prev, cmdredir_p next) {
 
     cmdredir_p r;
@@ -21,6 +37,12 @@ cmdredir_p cmdredir_new (cmdoper_p oper, char *cmd, int redir, cmdredir_p prev, 
     return r;
 }
 
+/**
+ * \fn void cmdredir_free (cmdredir_p r)
+ * \brief Destructeur d'objet cmdredir
+ *
+ * \param r Pointeur sur objet cmdredir
+ */
 void cmdredir_free (cmdredir_p r) {
     cmdredir_p tmp;
     while (r) {
@@ -32,6 +54,13 @@ void cmdredir_free (cmdredir_p r) {
     }
 }
 
+/**
+ * \fn void cmdredir_print (mysh_context_p ctx, cmdredir_p r)
+ * \brief Affiche un cmdredir
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur objet cmdredir
+ */
 void cmdredir_print (mysh_context_p ctx, cmdredir_p r) {
     for ( ; r != NULL; r = r->next) {
 
@@ -59,6 +88,14 @@ void cmdredir_print (mysh_context_p ctx, cmdredir_p r) {
     }
 }
 
+/**
+ * \fn cmdredir_p cmdredir_parser (mysh_context_p ctx, cmdoper_p oper)
+ * \brief Parser de cmdredir (en se basant sur cmd de cmdoper)
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param oper cmdoper parent
+ * \return cmdredir_p retourne le pointeur sur le 1er élément de la liste chainée
+ */
 cmdredir_p cmdredir_parser (mysh_context_p ctx, cmdoper_p oper) {
 
     int b_escape = false;
@@ -189,6 +226,13 @@ cmdredir_p cmdredir_parser (mysh_context_p ctx, cmdoper_p oper) {
     return cmdredir_first;
 }
 
+/**
+ * \fn void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p r)
+ * \brief Fonction de facilité pour Parser de cmdargs
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur liste chainée de cmdredir
+ */
 void cmdredir_parse_args (mysh_context_p ctx, cmdredir_p r) {
     for ( ; r != NULL; r = r->next) {
         r->nargs = cmdargs_parser(ctx, r->cmd, &(r->args));

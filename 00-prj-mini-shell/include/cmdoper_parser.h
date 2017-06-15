@@ -1,3 +1,10 @@
+/**
+ * \file cmdoper_parser.h
+ * \brief Parser de 'cmdoper' (notion expliquée +bas)
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef CMDOPER_PARSER_H_
 #define CMDOPER_PARSER_H_
 

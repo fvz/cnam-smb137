@@ -1,3 +1,10 @@
+/**
+ * \file facilities.h
+ * \brief Ensemble de fonctions diverses apportant quelques facilités de code.
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYSH_FACILITIES_H_
 #define MYSH_FACILITIES_H_
 

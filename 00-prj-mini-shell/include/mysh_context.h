@@ -1,3 +1,10 @@
+/**
+ * \file mysh_context.h
+ * \brief Gestion du contexte de session
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYSH_CONTEXT_H_
 #define MYSH_CONTEXT_H_
 

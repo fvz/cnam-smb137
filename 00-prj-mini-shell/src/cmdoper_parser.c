@@ -72,6 +72,12 @@ cmdoper_p cmdoper_new (char *cmd, int type, cmdoper_p prev, cmdoper_p next) {
     return o;
 }
 
+/**
+ * \fn void cmdoper_free (cmdoper_p o)
+ * \brief Destructeur d'objet cmdoper
+ *
+ * \param o Pointeur sur liste chainée de cmdoper à libérer
+ */
 void cmdoper_free (cmdoper_p o) {
     cmdoper_p tmp;
     while (o) {
@@ -83,6 +89,13 @@ void cmdoper_free (cmdoper_p o) {
     }
 }
 
+/**
+ * \fn void cmdoper_free (cmdoper_p o)
+ * \brief Affiche un cmdoper
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param o Pointeur sur cmdoper à afficher
+ */
 void cmdoper_print_one (mysh_context_p ctx, cmdoper_p o) {
     char *type_str = NULL;
     if (o->type == CMDOPER_EMPTY) {
@@ -107,12 +120,27 @@ void cmdoper_print_one (mysh_context_p ctx, cmdoper_p o) {
     freeif(type_str);
 }
 
+/**
+ * \fn void cmdoper_print (mysh_context_p ctx, cmdoper_p o)
+ * \brief Affiche une liste chaînée de cmdoper
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param o Pointeur sur liste chaînée de cmdoper à afficher
+ */
 void cmdoper_print (mysh_context_p ctx, cmdoper_p o) {
     for( ; o!=NULL; o=o->next) {
         cmdoper_print_one (ctx, o);
     }
 }
 
+/**
+ * \fn cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str)
+ * \brief Parser de cmdoper
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param str chaine à analyser
+ * \return cmdredir_p retourne le pointeur sur le 1er élément de la liste chainée
+ */
 cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
 
     int b_escape = false;
@@ -236,6 +264,13 @@ cmdoper_p cmdoper_parser (mysh_context_p ctx, char *str) {
     return cmdoper_first;
 }
 
+/**
+ * \fn void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p o)
+ * \brief Fonction de facilité pour Parser de cmdredir
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur liste chainée de cmdoper
+ */
 void cmdoper_parse_redir (mysh_context_p ctx, cmdoper_p o) {
     for ( ; o != NULL; o = o->next) {
         o->redir = cmdredir_parser(ctx, o);

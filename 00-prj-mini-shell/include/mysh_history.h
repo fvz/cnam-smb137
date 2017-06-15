@@ -1,3 +1,9 @@
+/**
+ * \file mysh_history.h
+ * \brief Gestion de l'historique des commandes passées dans mysh.
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
 #ifndef MYSH_HISTORY_H_
 #define MYSH_HISTORY_H_
 

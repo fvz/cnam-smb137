@@ -1,5 +1,5 @@
 
- o errno + print
+ o More errno + print
 
  o alias
     - Add some default alias in executing mysh

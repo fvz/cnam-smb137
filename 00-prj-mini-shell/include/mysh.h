@@ -1,3 +1,10 @@
+/**
+ * \file mysh.h
+ * \brief mysh : développement d'un shell maison -- header principal
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYSH_MYSH_H_
 #define MYSH_MYSH_H_
 

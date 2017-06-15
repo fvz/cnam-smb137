@@ -1,14 +1,29 @@
-#include "mysh.h"
+/**
+ * \file mysh_context.c
+ * \brief Gestion du contexte de session
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #include "mysh_context.h"
 
 #define USAGE_SYNTAX "[OPTIONS]"
 #define USAGE_PARAMS "OPTIONS:\n\
   -c, --command=COMMANDS   execute specified command(s).\n\
+  -d, --debug              display some debug messages.\n\
+  -v, --verbose            display some verbose messages.\n\
+ For debug/verbose argument, you can increase the level by\n\
+ repeat the arguments (Ex:  -dd, -vvv).\n\
 ***\n\
   -h, --help               display this help\n\
 "
 
-
+/**
+ * \fn void print_usage(char* bin_name)
+ * \brief Affichage de l'usage
+ *
+ * \param bin_name nom du binaire de l'executablt
+ */
 void print_usage(char* bin_name)
 {
 	printf("USAGE: %s %s\n\n%s\n", bin_name, USAGE_SYNTAX, USAGE_PARAMS);
@@ -24,6 +39,14 @@ struct option binary_opts[] =
 };
 const char* binary_optstr = "c:dvh";
 
+/**
+ * \fn void mysh_context_init (mysh_context_p ctx, int argc, char **argv)
+ * \brief Initialiseur d'objet mysh_context_p
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param argc argc du main
+ * \param argv argv du main
+ */
 void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
 
     mysh_prompt_set(ctx, MYSH_DEFAULT_PROMPT);
@@ -48,6 +71,14 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
     cmdalias_list_init(ctx);
 }
 
+/**
+ * \fn mysh_context_p mysh_context_new (int argc, char** argv)
+ * \brief Constructeur d'objet mysh_context_p
+ *
+ * \param argc argc du main
+ * \param argv argv du main
+ * \return mysh_context_p retourne le pointeur sur nouvel élément alloué
+ */
 mysh_context_p mysh_context_new (int argc, char** argv) {
 
     mysh_context_p ctx = (mysh_context_p) malloc (sizeof(mysh_context_t));
@@ -81,6 +112,12 @@ mysh_context_p mysh_context_new (int argc, char** argv) {
     return ctx;
 }
 
+/**
+ * \fn void mysh_context_free (mysh_context_p ctx)
+ * \brief Destructeur d'objet mysh_context_p
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ */
 void mysh_context_free (mysh_context_p ctx) {
     if (ctx != NULL) {
         mysh_prompt_free(ctx);

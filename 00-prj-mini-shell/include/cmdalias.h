@@ -1,3 +1,10 @@
+/**
+ * \file cmdalias.h
+ * \brief Mécanisme d'alias de commande
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef CMDALIAS_H_
 #define CMDALIAS_H_
 

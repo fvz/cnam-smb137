@@ -1,3 +1,10 @@
+/**
+ * \file mysh_prompt.h
+ * \brief Gestion du prompt (affichage, récupération des commandes saisies)
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYSH_PROMPT_H_
 #define MYSH_PROMPT_H_
 

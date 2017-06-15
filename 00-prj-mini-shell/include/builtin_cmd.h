@@ -1,3 +1,10 @@
+/**
+ * \file builtin_cmd.h
+ * \brief Fonctionnalités Built-in
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef BUILTIN_CMD_H_
 #define BUILTIN_CMD_H_
 

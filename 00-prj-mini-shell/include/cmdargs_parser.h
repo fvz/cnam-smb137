@@ -1,3 +1,10 @@
+/**
+ * \file cmdargs_parser.h
+ * \brief Parser d'arguments d'une commande
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef CMDARGS_PARSER_H_
 #define CMDARGS_PARSER_H_
 

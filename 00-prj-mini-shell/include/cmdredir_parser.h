@@ -1,3 +1,10 @@
+/**
+ * \file cmdredir_parser.h
+ * \brief Parser de 'cmdredir'
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef CMDREDIR_PARSER_H_
 #define CMDREDIR_PARSER_H_
 

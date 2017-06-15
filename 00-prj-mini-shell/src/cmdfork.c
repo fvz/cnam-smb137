@@ -1,6 +1,6 @@
 /**
- * \file cmdhandle.c
- * \brief Traitement des forks pour execution des commandes non built-in
+ * \file cmdfork.c
+ * \brief Traitement des forks pour execution des commandes built-in ou non
  * \author Fabien VANTARD
  * \version 0.1
  */
@@ -27,7 +27,9 @@ void cmdfork_exec(mysh_context_p ctx, cmdredir_p r) {
 
     if (child == 0) { /* child */
         ctx_dbmyprintf(1, ctx, M_CMDFORK_INCHILD_WORK_EXEC, getpid(), r->cmd);
-        if (!builtin_loop_scan (ctx, r)) {
+        if (builtin_loop_scan (ctx, r)) {
+            /* a builtin cmd has been found and executed. */
+        } else {
             execvp(r->args[0], r->args);
             printf("execlp failed %s\n", strerror(errno));
         }
@@ -37,6 +39,57 @@ void cmdfork_exec(mysh_context_p ctx, cmdredir_p r) {
         ctx_dbmyprintf(1, ctx, M_CMDFORK_END_OF_WAIT, ppid, child, WEXITSTATUS(status));
         o->exitstatus = WEXITSTATUS(status);
         o->cmdexec = true;
+    }
+}
+
+
+
+
+
+
+
+/**
+ * \fn void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r)
+ * \brief
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r) {
+
+    int pfd[2];
+
+    printf("=== [%s] | [%s] ===\n", r->args[0], r->next->args[0]);
+
+    /* create the pipe */
+    if (pipe(pfd) == -1) {
+        printf("pipe failed\n");
+        //return 1;
+    }
+
+    /* create the child */
+    int  pid;
+    if ((pid = fork()) < 0) {
+        printf("fork failed\n");
+        //return 2;
+    }
+
+    if (pid == 0) {
+        /* child */
+        close(pfd[1]); /* close the unused write side */
+        dup2(pfd[0], 0); /* connect the read side with stdin */
+        close(pfd[0]); /* close the read side */
+        /* execute the process (wc command) */
+        execvp(r->next->args[0], r->args);
+        printf("%s failed", r->next->args[0]); /* if execlp returns, it's an error */
+    } else {
+        /* parent */
+        close(pfd[0]); /* close the unused read side */
+        dup2(pfd[1], 1); /* connect the write side with stdout */
+        close(pfd[1]); /* close the write side */
+        /* execute the process (ls command) */
+        execvp(r->args[0], r->args);
+        printf("%s failed", r->args[0]); /* if execlp returns, it's an error */
     }
 }
 
@@ -203,6 +256,7 @@ void cmdfork_pipe4(mysh_context_p ctx, cmdredir_p r) {
         }
     }
 
+    printf ("%d %d\n", parentstatus, childstatus);
 }
 
 
@@ -211,52 +265,6 @@ void cmdfork_pipe4(mysh_context_p ctx, cmdredir_p r) {
 
 
 
-
-
-/**
- * \fn void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r)
- * \brief
- *
- * \param ctx Pointeur sur le contexte mysh_context
- * \param r Pointeur sur le CmdRedir en cours
- */
-void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r) {
-
-    int pfd[2];
-
-    printf("=== [%s] | [%s] ===\n", r->args[0], r->next->args[0]);
-
-    /* create the pipe */
-    if (pipe(pfd) == -1) {
-        printf("pipe failed\n");
-        //return 1;
-    }
-
-    /* create the child */
-    int  pid;
-    if ((pid = fork()) < 0) {
-        printf("fork failed\n");
-        //return 2;
-    }
-
-    if (pid == 0) {
-        /* child */
-        close(pfd[1]); /* close the unused write side */
-        dup2(pfd[0], 0); /* connect the read side with stdin */
-        close(pfd[0]); /* close the read side */
-        /* execute the process (wc command) */
-        execvp(r->next->args[0], r->args);
-        printf("%s failed", r->next->args[0]); /* if execlp returns, it's an error */
-    } else {
-        /* parent */
-        close(pfd[0]); /* close the unused read side */
-        dup2(pfd[1], 1); /* connect the write side with stdout */
-        close(pfd[1]); /* close the write side */
-        /* execute the process (ls command) */
-        execvp(r->args[0], r->args);
-        printf("%s failed", r->args[0]); /* if execlp returns, it's an error */
-    }
-}
 
 
 /**
@@ -267,7 +275,8 @@ void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r) {
  * \param r Pointeur sur le CmdRedir en cours
  */
 void cmdfork_truncat(mysh_context_p ctx, cmdredir_p r) {
-    int fd, fd_stdout;
+    int fd;
+    int fd_stdout;
     if (r->next && r->next->args) {
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
         fd = open(r->next->args[0], O_TRUNC | O_WRONLY);
@@ -287,13 +296,40 @@ void cmdfork_truncat(mysh_context_p ctx, cmdredir_p r) {
  */
 void cmdfork_append(mysh_context_p ctx, cmdredir_p r) {
     int fd;
+    int fd_stdout;
     if (r->next && r->next->args) {
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
         fd = open(r->next->args[0], O_RDWR|O_APPEND|O_CREAT, 00744);
+        fd_stdout = dup(fileno(stdout));
         dup2(fd, fileno(stdout));
         close(fd);
     }
 }
+
+
+
+/**
+ * \fn void cmdfork_input(mysh_context_p ctx, cmdredir_p r)
+ * \brief
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+void cmdfork_input(mysh_context_p ctx, cmdredir_p r) {
+    /* TODO */
+}
+
+/**
+ * \fn void cmdfork_dinput(mysh_context_p ctx, cmdredir_p r)
+ * \brief
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+void cmdfork_dinput(mysh_context_p ctx, cmdredir_p r) {
+    /* TODO */
+}
+
 
 
 
@@ -342,36 +378,6 @@ main(int argc, char *argv[])
 
 
 
-
-
-
-
-
-
-
-
-
-/*
-            switch(r->redir) {
-                case CMDREDIR_EMPTY:
-                    break;
-                case CMDREDIR_PIPE:
-                    break;
-                case CMDREDIR_TRUNCAT:
-                    break;
-                case CMDREDIR_APPEND:
-                    break;
-                case CMDREDIR_INPUT:
-                    break;
-                case CMDREDIR_DINPUT:
-                    break;
-                default:
-                    break;
-            }
-*/
-
-
-
 #if 0
 int main(void)
 {
@@ -399,10 +405,6 @@ int main(void)
     return EXIT_SUCCESS;
 }
 #endif
-
-
-
-
 
 
 #if 0

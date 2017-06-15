@@ -1,3 +1,10 @@
+/**
+ * \file myprintf.h
+ * \brief Ensemble de fonctions d'affichage (verbose/debug).
+ * \author Fabien VANTARD
+ * \version 0.1
+ */
+
 #ifndef MYPRINTF_H_
 #define MYPRINTF_H_
 
