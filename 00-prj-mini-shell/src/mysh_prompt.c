@@ -7,7 +7,6 @@
 
 #include "mysh_prompt.h"
 
-
 /**
  * \fn void mysh_prompt_set_with_new(mysh_context_p ctx, char *prompt)
  * \brief Redéfinition du prompt à afficher (il est stocké dans le contexte)

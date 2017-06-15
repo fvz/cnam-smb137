@@ -55,6 +55,7 @@ struct mysh_context_s {
     char *previous_dir;
 
     cmdalias_p *alias;
+    int nalias;
 };
 
 /* context status */
@@ -127,7 +128,7 @@ struct builtincmd_s {
 
 
 struct cmdalias_s {
-    char *alias;    /* alias name */
+    char *name;    /* alias name */
     char *cmd;      /* and it's commande */
 };
 

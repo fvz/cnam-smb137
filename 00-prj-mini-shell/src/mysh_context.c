@@ -43,6 +43,7 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
     ctx->previous_dir = NULL;
 
     ctx->alias = NULL;
+    ctx->nalias = 0;
 }
 
 mysh_context_p mysh_context_new (int argc, char** argv) {

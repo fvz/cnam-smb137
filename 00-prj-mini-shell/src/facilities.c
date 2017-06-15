@@ -7,7 +7,6 @@
 
 #include "facilities.h"
 
-
 /**
  * Procedure checks if variable must be free
  * (check: ptr != NULL)

@@ -3,7 +3,6 @@
 
 #include "mysh.h"
 
-
 void vmyprintf_stream(FILE * stream, int threshold, int level, const char *format, va_list args);
 void myprintf_stream(FILE * stream, int threshold, int level, const char *format, ...);
 #define myprintf(threshold, level, ...) \
@@ -63,6 +62,18 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 /* mysh_prompt messages */
 /* --N/A-- */
 
+/* cmdalias messages */
+#define M_CMDALIAS                      "[cmdalias]"
+#define M_CMDALIAS_PARSER_PARSE_CMD     M_CMDALIAS" Parse arg [%s] to get alias\n"
+#define M_CMDALIAS_PARSER_CURSOR_IS     M_CMDALIAS" "M_COMMON_CURSOR_IS"\n"
+#define M_CMDALIAS_PARSER_ANALYZE_CHAR  M_CMDALIAS" "M_COMMON_ANALYZE_CHAR"\n"
+#define M_CMDALIAS_PARSER_NAME_FOUND    M_CMDALIAS" Found alias name [%s]\n"
+#define M_CMDALIAS_PARSER_CMD_FOUND     M_CMDALIAS" Found alias cmd [%s]\n"
+#define M_CMDALIAS_PARSER_END_GIVE      M_CMDALIAS" End of parser. This arg [%s] give the [%s]=[%s] alias.\n"
+#define M_CMDALIAS_ALIAS_DEFINITION     "alias %s='%s'\n"
+#define M_CMDALIAS_NO_ALIAS_DEFINED     "No aliases defined.\n"
+#define M_CMDALIAS_ALIAS_NOT_DEFINED    "alias %s is not defined.\n"
+
 /* cmdhandle messages */
 #define M_CMDHANDLE                     "[cmdhandle]"
 #define M_CMDHANDLE_START_PARSER        M_CMDHANDLE" === Starting the parser engine ============\n"
@@ -70,6 +81,7 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_END_ENGINE          M_CMDHANDLE" === Ending the handling engine ============\n"
 #define M_CMDHANDLE_HANDLING_CMD        M_CMDHANDLE" Handling command [%s]\n"
 #define M_CMDHANDLE_HANDLING_REDIR      M_CMDHANDLE" Handling redirection [%s]\n"
+#define M_CMDHANDLE_ALIAS_FOUND         M_CMDHANDLE" Alias found for [%s] command : "M_CMDALIAS_ALIAS_DEFINITION
 #define M_CMDHANDLE_IN_EXITING_WF       M_CMDHANDLE" Currently in exiting workflow. Ignoring [%s] command.\n"
 #define M_CMDHANDLE_OK4EXIT             "OK for exiting."
 #define M_CMDHANDLE_OKEXIT              M_CMDHANDLE" "M_CMDHANDLE_OK4EXIT"\n"
@@ -94,6 +106,15 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_BUILTIN_CMD_CD_ERR_DETAILS    M_BUILTIN" Error in changing directory (result=[%d]).\n"
 #define M_BUILTIN_CMD_PWD_ERR           M_BUILTIN" Error in retrieving current directory.\n"
 #define M_BUILTIN_CMD_PWD_ERR_DETAILS   M_BUILTIN" Error in retrieving current directory [errno#%d='%s'].\n"
+#define M_BUILTIN_CMD_ALIAS_UNKNOWN_ERR M_BUILTIN" Built-in 'alias' command : unknown error.\n"
+#define M_BUILTIN_CMD_ALIAS_UNKNOWN_ERR_ARGS0_EMPTY \
+                                        M_BUILTIN" Built-in 'alias' command : unknown error (arg[0] empty).\n"
+#define M_BUILTIN_CMD_ALIAS_SEARCH      M_BUILTIN" Searching the alias [%s] in list\n"
+#define M_BUILTIN_CMD_ALIAS_FOUND       M_BUILTIN" Alias found [%s]=[%s]\n"
+#define M_BUILTIN_CMD_ALIAS_REDEFINE    M_BUILTIN" Redefining alias [%s] to [%s] command\n"
+#define M_BUILTIN_CMD_ALIAS_PRINT_ONE   M_BUILTIN" Printing alias [%s]=[%s]\n"
+#define M_BUILTIN_CMD_ALIAS_ADD         M_BUILTIN" Adding alias [%s]=[%s] to list\n"
+#define M_BUILTIN_CMD_ALIAS_PRINT_ALL   M_BUILTIN" Printing all [%d] alias list\n"
 
 /* cmdfork messages */
 #define M_CMDFORK                       "[cmdfork]"

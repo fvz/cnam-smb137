@@ -44,9 +44,7 @@
  *
  */
 
-#include "typedef.h"
 #include "cmdoper_parser.h"
-
 
 /**
  * \fn cmdoper_p cmdoper_new (char *cmd, int oper, cmdoper_p prev, cmdoper_p next)

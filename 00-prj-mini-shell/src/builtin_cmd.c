@@ -7,7 +7,6 @@
 
 #include "builtin_cmd.h"
 
-
 /**
  * \fn int builtin_loop (mysh_context_p ctx, cmdoper_p o)
  * \brief Cherche si cmd présente parmi les builtin et exécute la fonction le cas échéant.
@@ -212,14 +211,67 @@ int builtin_cmd_echo (mysh_context_p ctx, cmdredir_p r) {
 
 /**
  * \fn int builtin_cmd_alias (mysh_context_p ctx, cmdoper_p oper)
- * \brief Commande Built-in "alias" : elle (re)définit un alias ou affiche leur liste
+ * \brief Commande Built-in "alias" : gestion des alias
  *
  * \param ctx Pointeur sur le contexte mysh_context
  * \param r Pointeur sur le CmdRedir en cours
+ *
+ * Cette commande alias permet :
+ *  - de définir ou redéfinir un alias,
+ *  - d'afficher la valeur d'un alias (la commande correspondante),
+ *  - d'afficher l'ensemble des alias définis.
  */
 int builtin_cmd_alias (mysh_context_p ctx, cmdredir_p r) {
 
-    /* TODO */
+    if (!r) {
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "alias");
+        return EXIT_FAILURE;
+    }
+    
+    if ( ! r->args[0]) {
+        ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR);
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR_ARGS0_EMPTY);
+        return EXIT_FAILURE;
+    }
+
+    if (r->args[1] && r->args[1][0] != '\0') {
+
+        char *newalias, *newcmd;
+        newalias = newcmd = NULL;
+        if (cmdalias_parse_cmd(ctx, r->args[1], &newalias, &newcmd)) {
+
+            if (newalias) {
+                cmdalias_p found;
+                ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_SEARCH, newalias);
+                if ((found = cmdalias_search(ctx, newalias)) != NULL) {
+                    ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_FOUND, found->name, found->cmd);
+                    if (newcmd) {
+                        /* redefine an existing alias */
+                        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_REDEFINE, found->name, newcmd);
+                        cmdalias_redefine_cmd(found, newcmd);
+                    } else {
+                        /* if no new value, print the current value of alias */
+                        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_PRINT_ONE, found->name, found->cmd);
+                        cmdalias_print_one(found);
+                    }
+                } else {
+                    if (newcmd) {
+                        /* define a new alias */
+                        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_ADD, newalias, newcmd);
+                        cmdalias_add(ctx, newalias, newcmd);
+                    } else {
+                        printf(M_CMDALIAS_ALIAS_NOT_DEFINED, newalias);
+                    }
+                }
+            }
+            freeif(newalias);
+            freeif(newcmd);
+        }
+    } else {
+        /* print all alias */
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_PRINT_ALL, ctx->nalias);
+        cmdalias_print(ctx);
+    }
 
     return EXIT_SUCCESS;
 }

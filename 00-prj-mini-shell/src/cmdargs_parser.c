@@ -4,7 +4,7 @@
  * \author Fabien VANTARD
  * \version 0.1
  */
-#include "typedef.h"
+
 #include "cmdargs_parser.h"
 
 /**
@@ -20,6 +20,37 @@ void cmdargs_free (char ***array) {
     }
     free (*array);
     (*array) = NULL;
+}
+
+/**
+ * \fn void cmdargs_append (char ***array)
+ * \brief Ajoute un argument à la fin d'un tableau d'arguments (array = char **)
+ *
+ * \param array pointeur sur tableau d'arguments char* modifié
+ */
+int cmdargs_append (char ***array, char *arg) {
+    return cmdargs_append_with_new (array, strdup(arg));
+}
+
+/**
+ * \fn void cmdargs_append (char ***array)
+ * \brief Ajoute un argument à la fin d'un tableau d'arguments (array = char **)
+ *
+ * \param array pointeur sur tableau d'arguments char* modifié
+ *
+ * Dans ce cas, la chaine 'arg' n'est pas strdupée.
+ */
+int cmdargs_append_with_new (char ***array, char *arg) {
+
+    int ielt;
+    if (!array) { return -1; }
+    for(ielt=0; (*array) && (*array)[ielt]; ielt++) {
+        /* nothing : loop just count */
+    }
+    (*array) = realloc(*array, (ielt+2) * sizeof(char*));
+    (*array)[ielt++] = arg;
+    (*array)[ielt++] = NULL;
+    return ielt;
 }
 
 /**
