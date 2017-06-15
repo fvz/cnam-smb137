@@ -39,6 +39,8 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
 
     ctx->status = CTX_STATUS_LOOP;
     ctx->exitstatus = EXIT_SUCCESS;
+
+    ctx->previous_dir = NULL;
 }
 
 mysh_context_p mysh_context_new (int argc, char** argv) {
@@ -78,6 +80,7 @@ void mysh_context_free (mysh_context_p ctx) {
     if (ctx != NULL) {
         mysh_prompt_free(ctx);
         freeif(ctx->cmd);
+        freeif(ctx->previous_dir);
         mysh_history_free(ctx);
         free(ctx);
     }

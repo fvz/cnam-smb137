@@ -32,6 +32,8 @@ struct mysh_context_s {
 
     int status;
     int exitstatus;
+
+    char *previous_dir;
 };
 
 /* context status */

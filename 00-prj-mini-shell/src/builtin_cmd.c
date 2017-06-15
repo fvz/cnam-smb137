@@ -40,6 +40,9 @@ int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r) {
  */
 int builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
 
+    char *homedir;
+    char *to_dir;
+
     if (!r) {
         ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "cd");
         return EXIT_FAILURE;
@@ -51,24 +54,54 @@ int builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
         return EXIT_FAILURE;
     }
 
-    if (!r->args[1] || (r->args[1][0] == '\0')) {
-        /* TODO : simple 'cd' command is like 'cd ~' */
+    /*
+        cd "directory"      : change to directory
+        cd -                : change to the previous directory
+        cd ~                : change to the homedir of the current user
+    */
+
+    to_dir = NULL;
+    if (r->args[1] && r->args[1][0] != '\0' && (strcmp (r->args[1], "~") != 0)) {
+
+        if ((strcmp(r->args[1], "-") == 0) && (ctx->previous_dir != NULL)) {
+            to_dir = strdup(ctx->previous_dir);
+        } else {
+            to_dir = strdup(r->args[1]);
+        }
     } else {
-        ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_CD_ATTEMPTING, r->args[1]);
+        if ((homedir = getenv("HOME")) == NULL) {
+            homedir = getpwuid(getuid())->pw_dir;
+        }
+        if (homedir) {
+            freeif(to_dir);
+            to_dir = strdup(homedir);
+        }
+    }
+
+    if (to_dir) {
         int result;
-        if ((result = chdir(r->args[1])) != 0) {
+        char buff[BUFFER_SIZE];
+        ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_CD_ATTEMPTING, to_dir);
+
+        if (getcwd(buff, BUFFER_SIZE) != NULL) {
+            freeif(ctx->previous_dir);
+            ctx->previous_dir = strdup(buff);
+        }
+
+        if ((result = chdir(to_dir)) != 0) {
             /* TODO : errno + details */
             ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_ERR);
             ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_ERR_DETAILS, result);
             return EXIT_FAILURE;
         }
 
-        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, r->args[1]);
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, to_dir);
         /* we have changed of directory :
         we can set the new directory in the shell prompt */
-        mysh_prompt_set_with_new(ctx, strcat_dup(r->args[1], "#"));
+        mysh_prompt_set_with_new(ctx, strcat_dup(to_dir, "#"));
     }
 
+    freeif(to_dir);
     return EXIT_SUCCESS;
 }
 
