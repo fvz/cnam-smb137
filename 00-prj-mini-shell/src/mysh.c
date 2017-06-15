@@ -38,5 +38,5 @@ int main(int argc, char** argv)
 
     mysh_history_flush(ctx);
     mysh_context_free(ctx);
-	return EXIT_SUCCESS;
+	return ctx->exitstatus;
 }

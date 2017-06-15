@@ -19,19 +19,16 @@
  */
 int builtin_loop_scan (mysh_context_p ctx, cmdredir_p r) {
     int i;
-    int found = false;
 
     for(i=0; builtin_list[i].cb != NULL; i++) {
         if (strcmp(r->args[0], builtin_list[i].cmd) == 0) {
             ctx_dbmyprintf(1, ctx, M_BUILTIN_PROCESS_BUILTIN_CMD, r->args[0]);
-            //r->oper->exitstatus = EXIT_FAILURE; /* EXIT_FAILURE by default before executing cmd */
             r->oper->exitstatus = builtin_list[i].cb(ctx, r);
             r->oper->cmdexec = true;
-            found = true;
-            break;
+            return true;
         }
     }
-    return found;
+    return false;
 }
 
 /**
@@ -57,20 +54,19 @@ int builtin_cmd_cd (mysh_context_p ctx, cmdredir_p r) {
     if (!r->args[1] || (r->args[1][0] == '\0')) {
         /* TODO : simple 'cd' command is like 'cd ~' */
     } else {
-        int result;
         ctx_dbmyprintf(2, ctx, M_BUILTIN_CMD_CD_ATTEMPTING, r->args[1]);
-        if ((result = chdir(r->args[1])) == 0) {
-            //r->oper->exitstatus = EXIT_SUCCESS;
-            ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, r->args[1]);
-            /* we have changed of directory :
-            we can set the new directory in the shell prompt */
-            mysh_prompt_set_with_new(ctx, strcat_dup(r->args[1], "#"));
-        } else {
+        int result;
+        if ((result = chdir(r->args[1])) != 0) {
             /* TODO : errno + details */
             ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_ERR);
             ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_ERR_DETAILS, result);
             return EXIT_FAILURE;
         }
+
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_OK_CHANGED, r->args[1]);
+        /* we have changed of directory :
+        we can set the new directory in the shell prompt */
+        mysh_prompt_set_with_new(ctx, strcat_dup(r->args[1], "#"));
     }
 
     return EXIT_SUCCESS;
@@ -119,26 +115,25 @@ int builtin_cmd_exit (mysh_context_p ctx, cmdredir_p r) {
     }
 
     if (r->oper && ((oprev = r->oper->prev) != NULL)) {
-        /*
-        if ((oprev->type == CMDOPER_AND) && (oprev->cmdstatus == true)) {
+        if ((oprev->type == CMDOPER_AND) && (oprev->exitstatus == EXIT_SUCCESS)) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_AND);
-            ctx->status = CTX_STATUS_EXIT;
-        } else if ((oprev->type == CMDOPER_OR) && (oprev->cmdstatus == false)) {
+        } else if ((oprev->type == CMDOPER_OR) && (oprev->exitstatus == EXIT_FAILURE)) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_OR);
-            ctx->status = CTX_STATUS_EXIT;
         } else if (oprev->type == CMDOPER_SEMICOLON) {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_OPER_SCOLON);
-            ctx->status = CTX_STATUS_EXIT;
         } else {
             ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT);
-            ctx->status = CTX_STATUS_EXIT;
         }
-        */
     } else {
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_OKEXIT_NO_PREVCMD);
-        ctx->status = CTX_STATUS_EXIT;
     }
 
+    if (r->args && r->args[0] && r->args[1]) {
+        int s = atoi(r->args[1]);
+        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_EXIT_WITH_STATUS, s);
+        ctx->exitstatus = s;
+    }
+    ctx->status = CTX_STATUS_EXIT;
     return EXIT_SUCCESS;
 }
 

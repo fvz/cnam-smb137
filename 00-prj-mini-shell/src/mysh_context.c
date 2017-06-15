@@ -38,6 +38,7 @@ void mysh_context_init (mysh_context_p ctx, int argc, char **argv) {
     mysh_history_new(ctx);
 
     ctx->status = CTX_STATUS_LOOP;
+    ctx->exitstatus = EXIT_SUCCESS;
 }
 
 mysh_context_p mysh_context_new (int argc, char** argv) {

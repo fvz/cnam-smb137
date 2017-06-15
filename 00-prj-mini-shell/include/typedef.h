@@ -31,6 +31,7 @@ struct mysh_context_s {
     mysh_history_p history;
 
     int status;
+    int exitstatus;
 };
 
 /* context status */
