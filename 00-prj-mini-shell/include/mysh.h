@@ -17,8 +17,6 @@
 #include <getopt.h>
 
 
-
-
 /* for catching CTRL+C */
 #include <signal.h>
 
@@ -44,6 +42,7 @@
 #include "cmdargs_parser.h"
 #include "myprintf.h"
 #include "builtin_cmd.h"
+#include "cmdfork.h"
 
 
 

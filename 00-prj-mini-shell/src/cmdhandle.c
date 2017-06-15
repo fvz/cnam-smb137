@@ -44,41 +44,36 @@ void cmdline_handle (mysh_context_p ctx, char *cmdline) {
                 continue;
             }
 
-            if (!builtin_loop_scan (ctx, r)) {
-                printf("===CHILD / FORK ===\n");
-                if (r->prev == NULL) {
-                    int status = 0;
-                    pid_t child;
+            if (o->prev && (
+                (o->prev->type == CMDOPER_AND && o->prev->exitstatus == EXIT_FAILURE) ||
+                (o->prev->type == CMDOPER_OR && o->prev->exitstatus == EXIT_SUCCESS)
+            )) {
+                /*Don't exec the CURRENT command (because the PREVIOUS command
+                returned an EXIT_FAILURE status and the operator was a 'AND'.
+                But we consider that the CURRENT command is virtually exiting
+                with an EXIT_SUCCESS status.
+                --OR--
+                Don't exec the CURRENT command (because the PREVIOUS command
+                returned an EXIT_SUCCESS status and the operator was an 'OR'.
+                But we consider that the CURRENT command is virtually exiting
+                with an EXIT_SUCCESS status.*/
+                o->exitstatus = EXIT_SUCCESS;
+                o->cmdexec = false; /* but keep info that cmd not executed */
 
-                    child = fork();
-                    if (child == 0) {
-                        execvp(r->args[0], r->args);
-                        perror("execlp");
-                    } else {
-                        waitpid(child, &status, 0);
-                    }
-                }
+                ctx_dbmyprintf(1, ctx, M_CMDHANDLE_PREVCMD_OPER_SO_NOEXEC,
+                    (o->prev->type == CMDOPER_AND) ? "AND" : "OR",
+                    (o->prev->exitstatus == EXIT_FAILURE) ? "EXIT_FAILURE" : "EXIT_SUCCESS",
+                    o->cmd);
+
+                continue;
             }
 
-/*
-            switch(r->redir) {
-                case CMDREDIR_EMPTY:
-                    break;
-                case CMDREDIR_PIPE:
-                    break;
-                case CMDREDIR_TRUNCAT:
-                    break;
-                case CMDREDIR_APPEND:
-                    break;
-                case CMDREDIR_INPUT:
-                    break;
-                case CMDREDIR_DINPUT:
-                    break;
-                default:
-                    break;
+            if (builtin_loop_scan (ctx, r)) {
+                /* a builtin cmd has been found and executed. */
+                continue;
+            } else {
+                cmdfork_do(ctx, r);
             }
-*/
-
         }
     }
 

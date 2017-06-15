@@ -77,6 +77,8 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_OKEXIT_OPER_OR      M_CMDHANDLE" Previous Operator=OR (+ReturnCode=false) :"M_CMDHANDLE_OK4EXIT"\n"
 #define M_CMDHANDLE_OKEXIT_OPER_SCOLON  M_CMDHANDLE" Previous Operator=SEMICOLON : "M_CMDHANDLE_OK4EXIT"\n"
 #define M_CMDHANDLE_OKEXIT_NO_PREVCMD   M_CMDHANDLE" No Previous Command : "M_CMDHANDLE_OK4EXIT"\n"
+#define M_CMDHANDLE_PREVCMD_OPER_SO_NOEXEC \
+                                        M_CMDHANDLE" Previous Oper=%s (+%s) : don't execute [%s] cmd.\n"
 
 /* builtin messages */
 #define M_BUILTIN                       "[builtin]"
@@ -91,6 +93,13 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_BUILTIN_CMD_CD_ERR_DETAILS    M_BUILTIN" Error in changing directory (result=[%d]).\n"
 #define M_BUILTIN_CMD_PWD_ERR           M_BUILTIN" Error in retrieving current directory.\n"
 #define M_BUILTIN_CMD_PWD_ERR_DETAILS   M_BUILTIN" Error in retrieving current directory [errno#%d='%s'].\n"
+
+/* cmdfork messages */
+#define M_CMDFORK                       "[cmdfork]"
+#define M_CMDFORK_FORKING_CMD           M_CMDFORK" We have to forking for execute [%s] command.\n"
+#define M_CMDFORK_FORK_TO_CHILD_WAIT    M_CMDFORK" PPID[%d] Fork to child [%d] and wait/waitpid.\n"
+#define M_CMDFORK_INCHILD_WORK_EXEC     M_CMDFORK" PID [%d](Child) Working and executing [%s] command.\n"
+#define M_CMDFORK_END_OF_WAIT           M_CMDFORK" PPID[%d] End of waitpid [%d] + Exitstatus=[%d].\n"
 
 
 #endif /* MYPRINTF_H_ */

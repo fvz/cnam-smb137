@@ -86,7 +86,8 @@ struct cmdoper_s {
     cmdoper_p prev;     /* previous cmdoper in the 'oper' chain */
     cmdoper_p next;     /* and next ... */
 
-    int cmdstatus;      /* return code of command */
+    int cmdexec;        /* cmd has been executed (true) or not (false) */
+    int exitstatus;     /* return code of command */
 };
 
 #define CMDOPER_EMPTY      0x00    /* empty operator */
@@ -104,7 +105,7 @@ typedef struct builtincmd_s builtincmd_t;
 typedef builtincmd_t* builtincmd_p;
 struct builtincmd_s {
     char *cmd; /* command name */
-    void (*cb)(mysh_context_p ctx, cmdredir_p r); /* callback to call if this command is found */
+    int (*cb)(mysh_context_p ctx, cmdredir_p r); /* callback to call if this command is found */
 };
 
 
