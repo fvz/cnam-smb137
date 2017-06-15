@@ -2,6 +2,7 @@
  o errno + print
 
  o alias
+    - Add some default alias in executing mysh
     - Ability to set an alias to empty : it remove it
 
  o Parsers (cmdoper, cmdredir, cmdargs)
@@ -14,3 +15,6 @@
 
  o history :
 	- Use Arrow keys for navigate in history
+
+ o command line :
+    - replace '~' by the homedir of current user.

@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     mysh_context_p ctx = mysh_context_new (argc, argv);
 
     if (ctx->cmd) {
-		cmdline_handle(ctx, ctx->cmd);
+		cmdline_handle2(ctx, ctx->cmd);
     } else {
     	signal(SIGSEGV, signal_handler);
     	signal(SIGINT, signal_handler);
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 		while (ctx->status != CTX_STATUS_EXIT) {
 			mysh_prompt_print(ctx);
 			if (mysh_prompt_catch(ctx)) {
-				cmdline_handle (ctx, ctx->cmd);
+				cmdline_handle2(ctx, ctx->cmd);
 				mysh_prompt_release(ctx);
 			}
 		}

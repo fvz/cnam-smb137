@@ -300,3 +300,32 @@ void cmdalias_print(mysh_context_p ctx) {
         printf(M_CMDALIAS_NO_ALIAS_DEFINED);
     }
 }
+
+/**
+ * \fn void cmdalias_check_alias(mysh_context_p ctx, cmdredir_p r)
+ * \brief Vérifie si 1er argument est un alias et le remplace si besoin
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur l'objet cmdredir_p courant
+ */
+void cmdalias_check_alias(mysh_context_p ctx, cmdredir_p r) {
+
+    cmdalias_p alias;
+    if ((alias = cmdalias_search(ctx, r->args[0])) != NULL) {
+        char **array;
+        int i;
+        ctx_dbmyprintf(1, ctx, M_CMDHANDLE_ALIAS_FOUND, r->args[0], alias->name, alias->cmd);
+
+        /* replace r->args[0] by cmdargs_parse(alias->cmd) */
+        cmdargs_parser(ctx, alias->cmd, &array);
+        for (i=1; r->args[i]; i++) {
+            cmdargs_append_with_new(&array, r->args[i]);
+            r->args[i] = NULL;
+        }
+        cmdargs_free(&(r->args));
+        r->args = array;
+
+        /* Perhaps we can redefine r->cmd (by joining r->args with ' ' separators), but
+           the handling mecanism is working with r->args only. So it is a bit useless. */
+    }
+}

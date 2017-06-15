@@ -92,6 +92,9 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_CMDHANDLE_EXIT_WITH_STATUS    M_CMDHANDLE" Exiting with exitstatus [%d]\n"
 #define M_CMDHANDLE_PREVCMD_OPER_SO_NOEXEC \
                                         M_CMDHANDLE" Previous Oper=%s (+%s) : don't execute [%s] cmd.\n"
+#define M_CMDHANDLE_REDIR_TRUNCAT_TO    M_CMDHANDLE" Stdout redirection to [%s] (truncating).\n"
+#define M_CMDHANDLE_REDIR_APPEND_TO     M_CMDHANDLE" Stdout redirection to [%s] (appending).\n"
+
 
 /* builtin messages */
 #define M_BUILTIN                       "[builtin]"

@@ -16,5 +16,6 @@ void cmdalias_add(mysh_context_p ctx, char *name, char *cmd);
 int cmdalias_parse_cmd(mysh_context_p ctx, char *cmd, char **newalias, char **newcmd);
 void cmdalias_print_one(cmdalias_p alias);
 void cmdalias_print(mysh_context_p ctx);
+void cmdalias_check_alias(mysh_context_p ctx, cmdredir_p r);
 
 #endif /* CMDALIAS_H_ */

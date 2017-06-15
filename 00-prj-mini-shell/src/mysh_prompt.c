@@ -77,6 +77,10 @@ int mysh_prompt_catch(mysh_context_p ctx) {
 		return false;
 	}
 
+	if (buffer[0] == '\0') {
+		return false;
+	}
+
 	char *pos = NULL;
 	if ((pos = strchr(buffer, '\n'))) { *pos = '\0'; }
 
