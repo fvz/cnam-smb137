@@ -115,6 +115,10 @@ void ctx_dbmyprintf_stream(FILE * stream, int threshold, mysh_context_p ctx, con
 #define M_BUILTIN_CMD_ALIAS_PRINT_ONE   M_BUILTIN" Printing alias [%s]=[%s]\n"
 #define M_BUILTIN_CMD_ALIAS_ADD         M_BUILTIN" Adding alias [%s]=[%s] to list\n"
 #define M_BUILTIN_CMD_ALIAS_PRINT_ALL   M_BUILTIN" Printing all [%d] alias list\n"
+#define M_BUILTIN_CMD_HISTORY_UNKNOWN_ERR \
+                                        M_BUILTIN" Built-in 'history' command : unknown error.\n"
+#define M_BUILTIN_CMD_HISTORY_UNKNOWN_ERR_ARGS0_EMPTY \
+                                        M_BUILTIN" Built-in 'history' command : unknown error (arg[0] empty).\n"
 
 /* cmdfork messages */
 #define M_CMDFORK                       "[cmdfork]"

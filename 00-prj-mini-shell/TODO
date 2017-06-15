@@ -12,5 +12,5 @@
         For better perf, we can build the string in a buffer and print
         on the stdin by using 'printf' only one time.
 
-    - 'history' built-in command
-
+ o history :
+	- Use Arrow keys for navigate in history

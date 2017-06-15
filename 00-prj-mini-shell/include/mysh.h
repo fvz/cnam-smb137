@@ -45,5 +45,6 @@
 #include "cmdfork.h"
 #include "cmdalias.h"
 
+#define BUFFER_SIZE 1024
 
 #endif /* MYSH_MYSH_H_ */

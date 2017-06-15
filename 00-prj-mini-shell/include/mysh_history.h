@@ -12,5 +12,6 @@ mysh_history_p mysh_history_new(mysh_context_p ctx);
 void mysh_history_add(mysh_context_p ctx, char *cmd);
 void mysh_history_flush(mysh_context_p ctx);
 void mysh_history_free(mysh_context_p ctx);
+void mysh_history_print(mysh_context_p ctx);
 
 #endif /* MYSH_HISTORY_H_ */

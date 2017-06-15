@@ -160,3 +160,37 @@ void mysh_history_free(mysh_context_p ctx) {
     mysh_history_close_temp_file(ctx);
     free(ctx->history);
 }
+
+/**
+ * \fn void mysh_history_print(mysh_context_p ctx)
+ * \brief Affiche l'historique de commandes
+ *
+ * \param ctx Pointeur sur contexte mysh_context
+ */
+void mysh_history_print(mysh_context_p ctx) {
+
+    char path[PATH_MAX];
+    int fd;
+    const char *homedir;
+
+    mysh_history_flush(ctx);
+
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+
+    snprintf(path, PATH_MAX, "%s/%s", homedir, MYSH_HISTORY_DEFAULT_FILENAME);
+    if ((fd = open(path, O_RDONLY)) != -1) {
+
+        char buffer[BUFFER_SIZE+1];
+        ssize_t n_read;
+
+        lseek(fd, 0, SEEK_SET);
+        while ((n_read = read(fd, &buffer, (size_t)BUFFER_SIZE)) > 0) {
+            buffer[n_read] = '\0';
+            write(1, &buffer, n_read);
+        }
+        close(fd);
+    }
+
+}

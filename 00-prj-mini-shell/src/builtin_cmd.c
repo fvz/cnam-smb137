@@ -224,7 +224,7 @@ int builtin_cmd_alias (mysh_context_p ctx, cmdredir_p r) {
         ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "alias");
         return EXIT_FAILURE;
     }
-    
+
     if ( ! r->args[0]) {
         ctx_myprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR);
         ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_CD_UNKNOWN_ERR_ARGS0_EMPTY);
@@ -269,6 +269,31 @@ int builtin_cmd_alias (mysh_context_p ctx, cmdredir_p r) {
         ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_ALIAS_PRINT_ALL, ctx->nalias);
         cmdalias_print(ctx);
     }
+
+    return EXIT_SUCCESS;
+}
+
+/**
+ * \fn int builtin_cmd_history (mysh_context_p ctx, cmdredir_p r)
+ * \brief Commande Built-in "history" : affichage de l'historique
+ *
+ * \param ctx Pointeur sur le contexte mysh_context
+ * \param r Pointeur sur le CmdRedir en cours
+ */
+int builtin_cmd_history (mysh_context_p ctx, cmdredir_p r) {
+
+    if (!r) {
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_UNKNOWN_ERR, "history");
+        return EXIT_FAILURE;
+    }
+
+    if ( ! r->args[0]) {
+        ctx_myprintf(1, ctx, M_BUILTIN_CMD_HISTORY_UNKNOWN_ERR);
+        ctx_dbmyprintf(1, ctx, M_BUILTIN_CMD_HISTORY_UNKNOWN_ERR_ARGS0_EMPTY);
+        return EXIT_FAILURE;
+    }
+
+    mysh_history_print(ctx);
 
     return EXIT_SUCCESS;
 }
