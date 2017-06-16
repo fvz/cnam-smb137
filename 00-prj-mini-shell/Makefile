@@ -40,8 +40,8 @@ gcov: $(GEXEC)
 	$(GCOV_DIR)/$(GEXEC) -h
 	$(GCOV_DIR)/$(GEXEC) -i input -o output -v
 
-	find ./ -maxdepth 1 -name *.gcno -exec mv {} $(GCOV_DIR) \;
-	find ./ -maxdepth 1 -name *.gcda -exec mv {} $(GCOV_DIR) \;
+	find ./ -maxdepth 1 -name "*.gcno" -exec mv {} $(GCOV_DIR) \;
+	find ./ -maxdepth 1 -name "*.gcda" -exec mv {} $(GCOV_DIR) \;
 
 	gcov -o $(GCOV_DIR) $(GEXEC)
 	lcov -o $(GCOV_DIR)/$(LCOV_REPORT) -c -f -d $(GCOV_DIR)
