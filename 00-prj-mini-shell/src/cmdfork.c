@@ -276,12 +276,12 @@ void cmdfork_pipe4(mysh_context_p ctx, cmdredir_p r) {
  */
 void cmdfork_truncat(mysh_context_p ctx, cmdredir_p r) {
     int fd;
-    int fd_stdout;
+    //int fd_stdout;
     if (r->next && r->next->args) {
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
         fd = open(r->next->args[0], O_TRUNC | O_WRONLY);
 
-        fd_stdout = dup(fileno(stdout));
+        //fd_stdout = dup(fileno(stdout));
         dup2(fd, fileno(stdout));
         close(fd);
     }
@@ -296,11 +296,11 @@ void cmdfork_truncat(mysh_context_p ctx, cmdredir_p r) {
  */
 void cmdfork_append(mysh_context_p ctx, cmdredir_p r) {
     int fd;
-    int fd_stdout;
+    //int fd_stdout;
     if (r->next && r->next->args) {
         ctx_dbmyprintf(1, ctx, M_CMDHANDLE_REDIR_TRUNCAT_TO, r->next->args[0]);
         fd = open(r->next->args[0], O_RDWR|O_APPEND|O_CREAT, 00744);
-        fd_stdout = dup(fileno(stdout));
+        //fd_stdout = dup(fileno(stdout));
         dup2(fd, fileno(stdout));
         close(fd);
     }
