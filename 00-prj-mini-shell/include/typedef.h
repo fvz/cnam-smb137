@@ -36,8 +36,8 @@ typedef cmdalias_t* cmdalias_p;
 /* history
  */
 struct mysh_history_s {
-    int temp_fd;
-    char *temp_path;
+    int temp_fd;            /* file descriptor of history file */
+    char *temp_path;        /* filepath of this open history file */
 };
 
 
@@ -45,24 +45,24 @@ struct mysh_history_s {
 */
 struct mysh_context_s {
 
-    char *prompt;
+    char *prompt;           /* prompt to display after each executed cmdline */
 
-    int argc; char **argv;
+    int argc; char **argv;  /* argc/argv of main */
 
-    char *cmd;
+    char *cmd;              /* command line currently in analyze/execution */
 
-    int debug_level;
-    int verbose_level;
+    int debug_level;        /* debug level selected in options */
+    int verbose_level;      /* verbose level selected in options */
 
-    mysh_history_p history;
+    mysh_history_p history; /* history file currently open */
 
-    int status;
-    int exitstatus;
+    int status;             /* general status of main loop */
+    int exitstatus;         /* exit status for exiting program */
 
-    char *previous_dir;
+    char *previous_dir;     /* previous dir if 'cd' command is used */
 
-    cmdalias_p *alias;
-    int nalias;
+    cmdalias_p *alias;      /* array of alias (in this session) */
+    int nalias;             /* number of alias in this array */
 };
 
 /* context status */
@@ -135,7 +135,7 @@ struct builtincmd_s {
 
 
 struct cmdalias_s {
-    char *name;    /* alias name */
+    char *name;     /* alias name */
     char *cmd;      /* and it's commande */
 };
 
