@@ -51,8 +51,8 @@ struct mysh_context_s {
 
     char *cmd;
 
-	int debug_level;
-	int verbose_level;
+    int debug_level;
+    int verbose_level;
 
     mysh_history_p history;
 
