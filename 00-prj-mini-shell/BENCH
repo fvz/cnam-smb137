@@ -1,24 +1,211 @@
-
- make && ./bin/mysh
- make && ./bin/mysh -c "alias ll='ls -la';alias"
- make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias"
- make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias cc='ccc';alias"
- make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias lo='ls -lo';alias"
- make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2"
- make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2 /tmp"
- make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2 /tmp /tmp"
- make && ./bin/mysh -d -c "echo coucou"
- make && ./bin/mysh -d -c "echo coucou;exit"
- make && ./bin/mysh -d -c " echo coucou; exit;echo toto"
- make && ./bin/mysh -d -c "echo coucou; exit;echo toto"
- make && ./bin/mysh -d -c "echo coucou;exit;echo toto"
- make && ./bin/mysh -dd
- make && ./bin/mysh -dd -c "alias"
- make && ./bin/mysh -dd -c "alias ll"
- make && ./bin/mysh -dd -c "alias ll= 'ls -la'"
- make && ./bin/mysh -dd -c "alias ll=' ls -la'"
- make && ./bin/mysh -dd -c "alias ll='ls -la'"
- make && ./bin/mysh -dd -c "alias ll ='ls -la'"
- make && ./bin/mysh -dd -c "alias ll='ls -la';alias"
- make && ./bin/mysh -dd -c "alias ll='ls -l';alias la='ls -la';alias lo='ls -lo';alias"
- make && ./bin/mysh -dd -c "alias ll='ls -l';ll;ll /tmp2 /tmp /tmp"
+make && ./bin/mysh
+make && ./bin/mysh -c "alias ll='ls -la';alias"
+make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias"
+make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias cc='ccc';alias"
+make && ./bin/mysh -c "alias ll='ls -l';alias la='ls -la';alias lo='ls -lo';alias"
+make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2"
+make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2 /tmp"
+make && ./bin/mysh -c "alias ll='ls -l';ll;ll /tmp2 /tmp /tmp"
+make && ./bin/mysh -d -c "echo coucou"
+make && ./bin/mysh -d -c "echo coucou;exit"
+make && ./bin/mysh -d -c " echo coucou; exit;echo toto"
+make && ./bin/mysh -d -c "echo coucou; exit;echo toto"
+make && ./bin/mysh -d -c "echo coucou;exit;echo toto"
+make && ./bin/mysh -dd
+make && ./bin/mysh -dd -c "alias"
+make && ./bin/mysh -dd -c "alias ll"
+make && ./bin/mysh -dd -c "alias ll= 'ls -la'"
+make && ./bin/mysh -dd -c "alias ll=' ls -la'"
+make && ./bin/mysh -dd -c "alias ll='ls -la'"
+make && ./bin/mysh -dd -c "alias ll ='ls -la'"
+make && ./bin/mysh -dd -c "alias ll='ls -la';alias"
+make && ./bin/mysh -dd -c "alias ll='ls -l';alias la='ls -la';alias lo='ls -lo';alias"
+make && ./bin/mysh -dd -c "alias ll='ls -l';ll;ll /tmp2 /tmp /tmp"
+ cd;cd
+"exit"
+*echo a b
+/sbin/cat /tmp/aaa
+; echo B
+; echo coucou
+; echo coucou ; echo
+; exit
+;exit
+echo "a \"b
+a;b
+aa && exit
+aa;exit
+aaa "bbb" "
+aaa ; exit
+aaa"bbb"
+aaa"cdcd
+aaa;bbb
+aaa;exit
+alias
+alias ll=''
+alias ll='aaa'
+alias ll='ls -l'
+alias ll='ls -la'
+a|a
+a|b
+a||b
+a||b|c
+cat /tmp/aaa
+cat /tmp/aaa | /bin/grep a
+cat /tmp/aaa | /bin/grep c
+cat /tmp/aaa | grep a
+cat /tmp/aaa | grep u
+cat /tmp/aaa |grep a
+cat /tmp/aaa/
+cat /tmp/aaaa
+cat ~/.mysh_history
+ccdscds
+ccdscdsq ; exit
+cd
+cd 
+cd -
+cd /
+cd /etc
+cd /home
+cd /root
+cd /root/dev-cnam-smb137/cnam-smb137/00-prj-mini-shell
+cd /tmp
+cd /toto
+cd cd
+cd toto
+cd ~
+coucou
+date
+echo
+echo "a \"b
+echo "a \"b c"
+echo "a b
+echo "a b " " c d"
+echo "a b "" c d"
+echo "a b ""c d"
+echo "a b "c
+echo "a b "c 
+echo "a b c"
+echo "a b"
+echo "a b" "c d"
+echo "a b" c
+echo "a b" c d
+echo "a b"c
+echo "aa" ; echo "bb" ; exit ; echo "cc"
+echo "aaa bbb"
+echo "aaa bbb" "ccc ddd"
+echo "aaa"
+echo "aaa" "bbb"
+echo "aaa" bb "cc dd" ee
+echo "aaa" bb "cc dd" ee 'aaa"cdcd'
+echo "aaa" || false && echo "bbb"
+echo "aaa" || false || echo "bbb"
+echo "coucou a"
+echo -n aa
+echo -n aa bb
+echo -nn aa bb
+echo ; exit
+echo ; exit ; echo
+echo A ; echo B
+echo A | echo B
+echo a
+echo a > /tmp/aaa
+echo a b
+echo a b c
+echo a b c "d" "e f"
+echo a b c d 
+echo a b c d e
+echo a b | echo c d
+echo a c
+echo a;echo
+echo aa
+echo aa | grep a
+echo aaa
+echo aaa "bbb ccc" 'ddd eee'
+echo aaa "bbb ccc" ddd
+echo aaa > /tmp/aaa
+echo aaa >> /tmp/aaa
+echo aaa bbb "ccc ddd"
+echo aaa bbb 'ccc'
+echo aaa bbb ccc "ddd"
+echo aaa | /bin/grep a
+echo aaa | grep a
+echo aaa | grep b
+echo aaa;echo
+echo aaab
+echo aaab > /tmp/aaa
+echo aaab >> /tmp/aaa
+echo aa|grep a
+echo b c
+echo b d
+echo bbb >> /tmp/aaa
+echo c d ; echo a b
+echo cd bgf nhgf
+echo cds bgf 
+echo coucou
+echo coucuo > /tmp/toto
+echo echo "a b "" c d"
+echo ok
+echo ok | cat
+echo tata > /tmp/aaa
+echo tata >> /tmp/aaa
+echo tataa > /tmp/aaa
+echo tataa >> /tmp/aaa
+echo test > /tmp/toto
+echo test >> /tmp/totoo
+echo test; exit
+echo toto > /tmp/aaa
+echo toto >> /tmp/toto
+echo ttutu > /tmp/aaa
+echo ttutu >> /tmp/aaa
+echo;aaa
+echo;echo
+echo;echo;exit
+echo;exit;
+eee
+exit
+exit 1
+exit 2
+exit 3
+exit ; exit
+exit;
+exit;exit
+false && echo a && echo b
+false && echo a || echo b
+false || echo a && echo b
+false || echo a || echo b
+false || echo aa
+false||echo aa
+false||echo aa&&echo bb
+false||exit
+la
+ll
+ll /
+ll /tmp
+lmlm
+ls
+ls -a ; who
+ls -a | grep toto
+ls -al
+ls -l /tmp
+ls -l ; ps ; who
+ls /
+ls /tmp
+make
+print /tmp/aaa
+print a
+pwd
+test1
+test1|test1
+test2
+test2|test2
+true && echo "aa"
+true && echo a && echo b
+true && echo a || echo b
+true && echo a || echo b && echo d
+true && echo aa
+true || echo a && echo b
+true || echo a || echo b
+true || false && echo a || echo b
+true||echo aa
+true||echo aa&&echo bb
+true||exit

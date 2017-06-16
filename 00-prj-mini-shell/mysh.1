@@ -1,0 +1,54 @@
+.TH MYSH 1
+.SH NAME
+\fBmysh\fR -- minimal shell
+.SH SYNOPSIS
+.B mysh
+[\fB\-vdh\fR]
+[\fB\-c\fR \fICOMMANDS\fR]
+.SH DESCRIPTION
+.B mysh is a minimal shell written in C language and built in the context of SMB137 CNAM unit.
+.SH OPTIONS
+.TP
+.BR \-v ", "\-\-verbose\fR
+Verbose Mode : Display some verbose messages.
+.TP
+.BR \-d ", "\-\-debug\fR
+Debug Mode : Display some debugging messages.
+.TP
+.BR \-dd ", "\-vvv ", "\-dddd\fR
+For Verbose and Debug Modes, you can increase the level by repeating the arguments.
+.TP
+.BR \-h ", "\-\-help\fR
+Display the help.
+.TP
+.BR \-c ", " \-\-command =\fICOMMANDS\fR
+Batch Mode : you can give a command directly to execute.
+.SH FILES
+.I ~/.mysh_history
+.RS
+All commands are stored in history file and by user.
+
+.SH BUILTIN-COMMANDS
+The following commands are built-in commands directly in the mysh program. For all others commands, they are executed with a 'execvp' system call.
+.TP
+.BR cd
+Change the current directory.
+.TP
+.BR pwd
+Display the current directory.
+.TP
+.BR exit
+Set the mysh in an 'exit' loop and exit.
+.TP
+.BR echo
+Display some parameters.
+.TP
+.BR alias
+Set, reset or display an alias or all alias.
+.TP
+.BR history
+Display the commands history.
+.SH BUGS
+N/A
+.SH AUTHOR
+Fabien Vantard <f dot vantard at gmail dot com>
