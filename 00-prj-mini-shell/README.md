@@ -17,3 +17,5 @@ Le parseur CmdRedir prend en entrée une chaine de caractère qui correspond à 
 Le parseur CmdArgs est plus simple que celui des CmdOper ou CmdRedir. Il parcourt une chaîne de caractère qui correspond à un CmdRedir (en clair, tout ce qu’il y a entre 2 redirecteurs « | », « > », « >> », « < », « << »). Dans cette chaîne de caractères, le parseur recherche des espaces afin de générer une liste d’arguments. Attention, les simples ou doubles quotes sont bien gérés. Un espace dans un argument entre double quote ne donnera pas lieu à 2 arguments mais bien à un seul.
 
 Enfin, le parseur CmdAlias est très simple. Il analyse une chaîne à la recherche d’une définition d’alias, sur le modèle suivant : nom_alias='commande argument1 argument2 ...'
+
+![Principe](img/principe_cmdoper_redir_args.png?raw=true "Principe des CmdOper, CmdRedir et CmdArgs")
