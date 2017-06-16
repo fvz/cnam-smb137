@@ -19,34 +19,28 @@ void cmdfork_exec(mysh_context_p ctx, cmdredir_p r) {
     cmdoper_p o = r->oper;
     ctx_dbmyprintf(1, ctx, M_CMDFORK_FORKING_CMD, o->cmd);
 
-    int status;
-    pid_t child, ppid;
+    if (builtin_loop_scan (ctx, r)) {
+        /* a builtin cmd has been found and executed. */
+    } else {
+        int status;
+        pid_t child, ppid;
 
-    ppid = getpid();
-    child = fork();
+        ppid = getpid();
+        child = fork();
 
-    if (child == 0) { /* child */
-        ctx_dbmyprintf(1, ctx, M_CMDFORK_INCHILD_WORK_EXEC, getpid(), r->cmd);
-        if (builtin_loop_scan (ctx, r)) {
-            /* a builtin cmd has been found and executed. */
-        } else {
+        if (child == 0) { /* child */
+            ctx_dbmyprintf(1, ctx, M_CMDFORK_INCHILD_WORK_EXEC, getpid(), r->cmd);
             execvp(r->args[0], r->args);
             printf("execlp failed %s\n", strerror(errno));
+        } else { /* parent */
+            ctx_dbmyprintf(1, ctx, M_CMDFORK_FORK_TO_CHILD_WAIT, ppid, child);
+            waitpid(child, &status, 0);
+            ctx_dbmyprintf(1, ctx, M_CMDFORK_END_OF_WAIT, ppid, child, WEXITSTATUS(status));
+            o->exitstatus = WEXITSTATUS(status);
+            o->cmdexec = true;
         }
-    } else { /* parent */
-        ctx_dbmyprintf(1, ctx, M_CMDFORK_FORK_TO_CHILD_WAIT, ppid, child);
-        waitpid(child, &status, 0);
-        ctx_dbmyprintf(1, ctx, M_CMDFORK_END_OF_WAIT, ppid, child, WEXITSTATUS(status));
-        o->exitstatus = WEXITSTATUS(status);
-        o->cmdexec = true;
     }
 }
-
-
-
-
-
-
 
 /**
  * \fn void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r)
@@ -92,11 +86,6 @@ void cmdfork_pipe(mysh_context_p ctx, cmdredir_p r) {
         printf("%s failed", r->args[0]); /* if execlp returns, it's an error */
     }
 }
-
-
-
-
-
 
 void cmdfork_pipe_run1(int pfd[], char **args) {
     int pid;	/* we don't use the process ID here, but you may wnat to print it for debugging */
@@ -146,12 +135,6 @@ void cmdfork_pipe2(mysh_context_p ctx, cmdredir_p r) {
 	exit(0);
 }
 
-
-
-
-
-
-
 void cmdfork_pipe3(mysh_context_p ctx, cmdredir_p r) {
 
     int p[2];
@@ -177,11 +160,6 @@ void cmdfork_pipe3(mysh_context_p ctx, cmdredir_p r) {
         execvp(r->args[0], r->args);
     }
 }
-
-
-
-
-
 
 void cmdfork_pipe4(mysh_context_p ctx, cmdredir_p r) {
 
@@ -259,14 +237,6 @@ void cmdfork_pipe4(mysh_context_p ctx, cmdredir_p r) {
     printf ("%d %d\n", parentstatus, childstatus);
 }
 
-
-
-
-
-
-
-
-
 /**
  * \fn void cmdfork_truncat(mysh_context_p ctx, cmdredir_p r)
  * \brief
@@ -306,8 +276,6 @@ void cmdfork_append(mysh_context_p ctx, cmdredir_p r) {
     }
 }
 
-
-
 /**
  * \fn void cmdfork_input(mysh_context_p ctx, cmdredir_p r)
  * \brief
@@ -329,106 +297,3 @@ void cmdfork_input(mysh_context_p ctx, cmdredir_p r) {
 void cmdfork_dinput(mysh_context_p ctx, cmdredir_p r) {
     /* TODO */
 }
-
-
-
-
-
-#if 0
-int
-main(int argc, char *argv[])
-{
-    pid_t cpid, w;
-    int status;
-
-   cpid = fork();
-    if (cpid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
-
-   if (cpid == 0) {            /* Code executed by child */
-        printf("Child PID is %ld\n", (long) getpid());
-        if (argc == 1)
-            pause();                    /* Wait for signals */
-        _exit(atoi(argv[1]));
-
-   } else {                    /* Code executed by parent */
-        do {
-            w = waitpid(cpid, &status, WUNTRACED | WCONTINUED);
-            if (w == -1) {
-                perror("waitpid");
-                exit(EXIT_FAILURE);
-            }
-
-           if (WIFEXITED(status)) {
-                printf("exited, status=%d\n", WEXITSTATUS(status));
-            } else if (WIFSIGNALED(status)) {
-                printf("killed by signal %d\n", WTERMSIG(status));
-            } else if (WIFSTOPPED(status)) {
-                printf("stopped by signal %d\n", WSTOPSIG(status));
-            } else if (WIFCONTINUED(status)) {
-                printf("continued\n");
-            }
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-        exit(EXIT_SUCCESS);
-    }
-}
-#endif
-
-
-
-#if 0
-int main(void)
-{
-    pid_t p = fork();
-    if ( p == -1 ) {
-        perror("fork failed");
-        return EXIT_FAILURE;
-    }
-    else if ( p == 0 ) {
-        execl("/bin/sh", "bin/sh", "-c", "./failprog", "NULL");
-        return EXIT_FAILURE;
-    }
-
-    int status;
-    if ( waitpid(p, &status, 0) == -1 ) {
-        perror("waitpid failed");
-        return EXIT_FAILURE;
-    }
-
-    if ( WIFEXITED(status) ) {
-        const int es = WEXITSTATUS(status);
-        printf("exit status was %d\n", es);
-    }
-
-    return EXIT_SUCCESS;
-}
-#endif
-
-
-#if 0
-int main(int argc, char** argv)
-{
-	pid_t pere, fils;
-	int cr;
-
-	pere = getpid();
-	fils = fork();
-
-	if (fils == 0) {
-		pid_t p = getpid();
-		cr = p%10;
-		printf("[FILS]  PID=[%d]  PPID=[%d]  CR=[%d]\n", p, pere, cr);
-		return cr;
-	} else {
-		cr = 0;
-		printf("[PERE]  PID-fils=[%d]  --> attente terminaison (wait)...\n", fils);
-
-		wait(&cr);
-		printf("[PERE]  PID-fils=[%d] CR=[%d]\n", fils, cr>>8);
-	}
-
-	return EXIT_SUCCESS;
-}
-#endif
